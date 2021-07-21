@@ -27,7 +27,7 @@ bnmr(
 
 \item{outcomeName}{a string which is a colname of df corresponding to the outcome studied.}
 
-\item{bn_method}{method for BN structure learning. Possible values are "hc", "pc" or "mix". Default is "hc".}
+\item{bn_method}{method for BN structure learning. Possible values are the function name of structure learning algorithm implemented in bnlearn. Default is "hc".}
 
 \item{mr_model}{model for MR. Possible values are "linear" or "logit". Default is "linear".}
 
