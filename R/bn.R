@@ -5,7 +5,7 @@
 #' @param df a data frame which contains data of SNPs and specified exposure.
 #' @param snp a vector of string belonging to colnames of df, which is the name of SNPs included in BN structure learning.
 #' @param exposureName a string which is a colname of df corresponding to the exposure studied.
-#' @param bn_method method for BN structure learning. Possible values are "hc", "pc" or "mix". Default is "hc".
+#' @param bn_method method for BN structure learning. Possible values are the function name of structure learning algorithm implemented in bnlearn. Default is "hc".
 #' @param cutoff a numeric between 0 to 1. Those SNPs with score larger than "cutoff" will be chosen as IVs. Default is 0.7.
 #' @param repeats an integer standing for the times of bootstraping. Default is 100.
 #' @param nsam an integer standing for the sample size for bootstraping sampling. Default is 500.
@@ -22,20 +22,45 @@
 bn <- function(df,snp,exposureName,bn_method="hr",cutoff=0.7,repeats=100,nsam=500){
   library("bnlearn")
 
-  learnBNpc <- function(df,nsam){
+  learnBN <- function(df,nsam,bn_method){
     n <- nrow(df)
     iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
     dfSam <- df[iSam,]
-    model <- pc.stable(dfSam)
-    dfarc <- data.frame(model$arcs)
-    return(dfarc)
-  }
-
-  learnBNhc <- function(df,nsam){
-    n <- nrow(df)
-    iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
-    dfSam <- df[iSam,]
-    model <- hc(dfSam)
+    if(bn_method=="pc.stable"){
+      model <- pc.stable(dfSam)
+    }else if(bn_method=="gs"){
+      model <- gs(dfSam)
+    }else if(bn_method=="iamb"){
+      model <- iamb(dfSam)
+    }else if(bn_method=="fast.iamb"){
+      model <- fast.iamb(dfSam)
+    }else if(bn_method=="inter.iamb"){
+      model <- inter.iamb(dfSam)
+    }else if(bn_method=="iamb.fdr"){
+      model <- iamb.fdr(dfSam)
+    }else if(bn_method=="hc"){
+      model <- hc(dfSam)
+    }else if(bn_method=="tabu"){
+      model <- tabu(dfSam)
+    }else if(bn_method=="mmhc"){
+      model <- mmhc(dfSam)
+    }else if(bn_method=="rsmax2"){
+      model <- rsmax2(dfSam)
+    }else if(bn_method=="h2pc"){
+      model <- h2pc(dfSam)
+    }else if(bn_method=="mmpc"){
+      model <- mmpc(dfSam)
+    }else if(bn_method=="si.hiton.pc"){
+      model <- si.hiton.pc(dfSam)
+    }else if(bn_method=="hpc"){
+      model <- hpc(dfSam)
+    }else if(bn_method=="chow.liu"){
+      model <- chow.liu(dfSam)
+    }else if(bn_method=="aracne"){
+      model <- aracne(dfSam)
+    }else{
+      return(message("no this bn learning method"))
+    }
     dfarc <- data.frame(model$arcs)
     return(dfarc)
   }
@@ -53,41 +78,11 @@ bn <- function(df,snp,exposureName,bn_method="hr",cutoff=0.7,repeats=100,nsam=50
     return(df)
   }
 
-  BNbootstrapPC <- function(df,repeats,nsam){
-    arcsL <- replicate(repeats,learnBNpc(df,nsam),simplify = FALSE)
+  BNbootstrap <- function(df,repeats,nsam,bn_method){
+    arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
     library("plyr")
     arcsL <- do.call(rbind.fill,arcsL)
     arcsL <- rmBidire(arcsL)
-    arcsL$from <- as.factor(arcsL$from)
-    arcsL$to <-as.factor(arcsL$to)
-    arcsL$count <- rep(1,nrow(arcsL))
-    dfre <- aggregate(arcsL$count,by=list(arcsL$from,arcsL$to),FUN=sum)
-    colnames(dfre) <- c("from","to","count")
-    dfre <- arrange(dfre,-count)
-    return(dfre)
-  }
-
-  BNbootstrapHC <- function(df,repeats,nsam){
-    arcsL <- replicate(repeats,learnBNhc(df,nsam),simplify = FALSE)
-    library("plyr")
-    arcsL <- do.call(rbind.fill,arcsL)
-    arcsL$from <- as.factor(arcsL$from)
-    arcsL$to <-as.factor(arcsL$to)
-    arcsL$count <- rep(1,nrow(arcsL))
-    dfre <- aggregate(arcsL$count,by=list(arcsL$from,arcsL$to),FUN=sum)
-    colnames(dfre) <- c("from","to","count")
-    dfre <- arrange(dfre,-count)
-    return(dfre)
-  }
-
-  BNbootstrapBi <- function(df,repeats,nsam){
-    arcsL <- replicate(repeats/2,learnBNpc(df,nsam),simplify = FALSE)
-    arcsL2 <- replicate(repeats/2,learnBNhc(df,nsam),simplify = FALSE)
-    library("plyr")
-    arcsL <- do.call(rbind.fill,arcsL)
-    arcsL <- rmBidire(arcsL)
-    arcsL2 <- do.call(rbind.fill,arcsL2)
-    arcsL <- rbind(arcsL,arcsL2)
     arcsL$from <- as.factor(arcsL$from)
     arcsL$to <-as.factor(arcsL$to)
     arcsL$count <- rep(1,nrow(arcsL))
@@ -120,17 +115,7 @@ bn <- function(df,snp,exposureName,bn_method="hr",cutoff=0.7,repeats=100,nsam=50
   dfsnp <- df[,snp]
   exposure <- df[,exposureName]
 
-
-  if(bn_method=="pc"){
-    dfre <- BNbootstrapPC(df1,repeats,nsam)
-  }else if(bn_method=="hc"){
-    dfre <- BNbootstrapHC(df1,repeats,nsam)
-  }else if(bn_method=="mix"){
-    dfre <- BNbootstrapBi(df1,repeats,nsam)
-  }else{
-    return(message("no this bn learning method"))
-  }
-
+  dfre <- BNbootstrap(df1,repeats,nsam,bn_method)
   dfscore <- getscore(dfre,exposureName,snp,repeats)
   selectsnp <- dfscore[which(dfscore$score>=cutoff),"snp"]
 
