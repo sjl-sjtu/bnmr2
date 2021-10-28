@@ -30,28 +30,32 @@
 #'
 #'
 bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hr",mr_model="linear",cutoff=0.7,repeats=100,nsam=500,init="median",n.iter=500){
-  library(bnlearn)
-  library(rstan)
-  library(MendelianRandomization)
-  options(mc.cores = parallel::detectCores())
-  rstan_options(auto_write = TRUE)
-
+  library("bnlearn")
+  library("plyr")
+  library("dplyr")
   learnBN <- function(df,nsam,bn_method){
     n <- nrow(df)
     iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
     dfSam <- df[iSam,]
+    rmFlag <- 0
     if(bn_method=="pc.stable"){
       model <- pc.stable(dfSam)
+      rmFlag = 1
     }else if(bn_method=="gs"){
       model <- gs(dfSam)
+      rmFlag = 1
     }else if(bn_method=="iamb"){
       model <- iamb(dfSam)
+      rmFlag = 1
     }else if(bn_method=="fast.iamb"){
       model <- fast.iamb(dfSam)
+      rmFlag = 1
     }else if(bn_method=="inter.iamb"){
       model <- inter.iamb(dfSam)
+      rmFlag = 1
     }else if(bn_method=="iamb.fdr"){
       model <- iamb.fdr(dfSam)
+      rmFlag = 1
     }else if(bn_method=="hc"){
       model <- hc(dfSam)
     }else if(bn_method=="tabu"){
@@ -76,27 +80,30 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hr",mr_model="linear
       return(message("no this bn learning method"))
     }
     dfarc <- data.frame(model$arcs)
+    dfarc$from <- as.character(dfarc$from)
+    dfarc$to <- as.character(dfarc$to)
+    if(rmFlag==1){
+      dfarc <- rmBidire(dfarc)
+    }
     return(dfarc)
   }
 
   rmBidire <- function(df){
-    delL <- c()
+    df <- arrange(df,from,to)
     for(i in 1:nrow(df)){
-      for(j in i+1:nrow(df)){
+      p <- which(df$from==df$from[i]|df$from==df$to[i])
+      for(j in setdiff(p,i)){
         if(all(df[j,]%in%df[i,])){
-          delL <- append(delL,j)
+          df <- df[-j,]
         }
       }
     }
-    df <- df[-delL,]
     return(df)
   }
 
   BNbootstrap <- function(df,repeats,nsam,bn_method){
     arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
-    library("plyr")
     arcsL <- do.call(rbind.fill,arcsL)
-    arcsL <- rmBidire(arcsL)
     arcsL$from <- as.factor(arcsL$from)
     arcsL$to <-as.factor(arcsL$to)
     arcsL$count <- rep(1,nrow(arcsL))
@@ -105,7 +112,6 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hr",mr_model="linear
     dfre <- arrange(dfre,-count)
     return(dfre)
   }
-
 
   getscore <- function(dfre,exposureName,snp,repeats){
     #exposureName is a str, snp is a vector of str.
@@ -123,6 +129,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hr",mr_model="linear
       score[i] <- (count1+count2)/repeats
     }
     dfscore <- data.frame(snp=snp,score=score)
+    dfscore$snp <- as.character(dfscore$snp)
     return(dfscore)
   }
 
