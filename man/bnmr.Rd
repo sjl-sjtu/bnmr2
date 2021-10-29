@@ -9,7 +9,7 @@ bnmr(
   snp,
   exposureName,
   outcomeName,
-  bn_method = "hr",
+  bn_method = "hc",
   mr_model = "linear",
   cutoff = 0.7,
   repeats = 100,
