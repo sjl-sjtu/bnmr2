@@ -31,7 +31,9 @@ bn_multi(
 }
 \value{
 a list containing:
+
   selectsnp: a list, each element is a vector of selected SNPs corresponding to each exposure.
+
   dfscore: a list, each element is a data frame containing the score calculated for each SNP corresponding to each exposure.
 }
 \description{

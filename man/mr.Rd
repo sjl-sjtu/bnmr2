@@ -31,12 +31,19 @@ mr(
 }
 \value{
 a list containing:
+
   thetaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
+
   mean: the mean estimate of the causal parameter.
+
   se: the SE of the estimation.
+
   sd: the SD of the estimation.
+
   lower: the lower boundary of the 95% CI of the causal estimation.
+
   upper: the upper boundary of the 95% CI of the causal estimation.
+
   Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.05).
 }
 \description{

@@ -31,8 +31,11 @@ bn(
 }
 \value{
 a list containing:
+
   selectsnp: a vector of string containing the colnames of df corresponding to
+
   selected SNPs.
+
   dfscore: a data frame containing the score calculated for each SNP.
 }
 \description{
