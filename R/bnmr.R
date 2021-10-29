@@ -15,14 +15,23 @@
 #' @param n.iter an integer standing for the number of iterations. Default is 500.
 #'
 #' @return a list containing:
+#'
 #'   selectsnp: a vector of string containing the colnames of df corresponding to selected SNPs.
+#'
 #'   dfscore: a data frame containing the score calculated for each SNP.
+#'
 #'   thetaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
+#'
 #'   mean: the mean estimate of the causal parameter.
+#'
 #'   se: the SE of the estimation.
+#'
 #'   sd: the SD of the estimation.
+#'
 #'   lower: the lower boundary of the 95% CI of the causal estimation.
+#'
 #'   upper: the upper boundary of the 95% CI of the causal estimation.
+#'
 #'   Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.05).
 #' @export
 #'

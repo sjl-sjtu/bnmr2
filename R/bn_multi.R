@@ -1,7 +1,7 @@
 #' @title Getting suitable genetic IVs for multiple exposures through Bayesian network learning
-#' 
+#'
 #' @description is used to get the suitable SNPs as instrumental variables (IVs) of multiple specified exposure by Bayesian network (BN) structure learning.
-#' 
+#'
 #' @param df a data frame which contains data of SNPs and specified exposure.
 #' @param snp a vector of string belonging to colnames of df, which is the name of SNPs included in BN structure learning.
 #' @param exposureName a vector of string which each element is a colname of df corresponding to the exposure studied.
@@ -11,7 +11,9 @@
 #' @param nsam an integer standing for the sample size for bootstraping sampling. Default is 500.
 #'
 #' @return a list containing:
+#'
 #'   selectsnp: a list, each element is a vector of selected SNPs corresponding to each exposure.
+#'
 #'   dfscore: a list, each element is a data frame containing the score calculated for each SNP corresponding to each exposure.
 #' @export
 #'
@@ -74,7 +76,7 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     }
     return(dfarc)
   }
-  
+
   rmBidire <- function(df){
     df <- arrange(df,from,to)
     for(i in 1:nrow(df)){
@@ -87,7 +89,7 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     }
     return(df)
   }
-  
+
   BNbootstrap <- function(df,repeats,nsam,bn_method){
     arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
     arcsL <- do.call(rbind.fill,arcsL)
@@ -99,7 +101,7 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     dfre <- arrange(dfre,-count)
     return(dfre)
   }
-  
+
   getscore <- function(dfre,exposureName,snp,repeats){
     #exposureName is a vector of str, snp is a vector of str.
     dfscoreList <- list()
@@ -124,11 +126,11 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     }
     return(dfscoreList)
   }
-  
+
   df1 <- df[,c(snp,exposureName)]
   dfsnp <- df[,snp]
   exposure <- df[,exposureName]
-  
+
   dfre <- BNbootstrap(df1,repeats,nsam,bn_method)
   dfscore <- getscore(dfre,exposureName,snp,repeats)
   selectsnp <- list()
@@ -136,7 +138,7 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     selectsnp1 <- dfscore[[i]][which(dfscore[[i]]$score>=cutoff),"snp"]
     selectsnp <- append(selectsnp,selectsnp1)
   }
-  
+
   re <- list(IV=selectsnp,score=dfscore)
   return(re)
 }
