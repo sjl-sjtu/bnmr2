@@ -19,7 +19,7 @@
 #' @examples
 #'
 #'
-bn <- function(df,snp,exposureName,bn_method="hr",cutoff=0.7,repeats=100,nsam=500){
+bn <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,nsam=500){
   library("bnlearn")
   library("plyr")
   library("dplyr")

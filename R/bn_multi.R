@@ -1,4 +1,22 @@
-bn_multi <- function(df,snp,exposureName,bn_method="hr",cutoff=0.7,repeats=100,nsam=500){
+#' @title Getting suitable genetic IVs for multiple exposures through Bayesian network learning
+#' 
+#' @description is used to get the suitable SNPs as instrumental variables (IVs) of multiple specified exposure by Bayesian network (BN) structure learning.
+#' 
+#' @param df a data frame which contains data of SNPs and specified exposure.
+#' @param snp a vector of string belonging to colnames of df, which is the name of SNPs included in BN structure learning.
+#' @param exposureName a vector of string which each element is a colname of df corresponding to the exposure studied.
+#' @param bn_method method for BN structure learning. Possible values are the function name of structure learning algorithm implemented in bnlearn. Default is "hc".
+#' @param cutoff a numeric between 0 to 1. Those SNPs with score larger than "cutoff" will be chosen as IVs. Default is 0.7.
+#' @param repeats an integer standing for the times of bootstraping. Default is 100.
+#' @param nsam an integer standing for the sample size for bootstraping sampling. Default is 500.
+#'
+#' @return a list containing:
+#'   selectsnp: a list, each element is a vector of selected SNPs corresponding to each exposure.
+#'   dfscore: a list, each element is a data frame containing the score calculated for each SNP corresponding to each exposure.
+#' @export
+#'
+#' @examples
+bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,nsam=500){
   library("bnlearn")
   library("plyr")
   library("dplyr")
