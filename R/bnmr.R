@@ -38,7 +38,7 @@
 #' @examples
 #'
 #'
-bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",mr_model="linear",cutoff=0.7,repeats=100,nsam=500,init="median",n.iter=500){
+bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",mr_model="linear",cutoff=0.7,repeats=100,nsam=500,sample_replace=TRUE,init="median",n.iter=500){
   library("bnlearn")
   library("plyr")
   library("dplyr")
