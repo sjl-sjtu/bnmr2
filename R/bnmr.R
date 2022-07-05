@@ -42,9 +42,18 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",mr_model="linear
   library("bnlearn")
   library("plyr")
   library("dplyr")
-  learnBN <- function(df,nsam,bn_method){
+  library("parallel")
+  learnBN <- function(iter,df,nsam,bn_method){
     n <- nrow(df)
-    iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
+    if(sample_replace==TRUE){
+      iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
+    }else{
+      if(nsam>n){
+          stop("subsample size is larger than the original sample size")
+      }else{
+          iSam <- sample(seq(1,n),size = nsam,replace=FALSE)
+      }
+    }
     dfSam <- df[iSam,]
     rmFlag <- 0
     if(bn_method=="pc.stable"){
@@ -89,14 +98,12 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",mr_model="linear
       return(message("no this bn learning method"))
     }
     dfarc <- data.frame(model$arcs)
-    dfarc$from <- as.character(dfarc$from)
-    dfarc$to <- as.character(dfarc$to)
     if(rmFlag==1){
       dfarc <- rmBidire(dfarc)
     }
     return(dfarc)
   }
-
+  
   rmBidire <- function(df){
     df <- arrange(df,from,to)
     for(i in 1:nrow(df)){
@@ -109,9 +116,19 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",mr_model="linear
     }
     return(df)
   }
-
+  
   BNbootstrap <- function(df,repeats,nsam,bn_method){
-    arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
+    cores <- detectCores(logical = FALSE)
+    cl <- makeCluster(cores)
+    clusterEvalQ(cl, {
+                      library("bnlearn")
+                      library("plyr")
+                      library("dplyr")
+                      })
+    clusterExport(cl,deparse(substitute(learnBN)),envir=environment())
+    arcsL <- parLapply(cl,seq(repeats),learnBN,df,nsam,bn_method)
+    stopCluster(cl)
+    # arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
     arcsL <- do.call(rbind.fill,arcsL)
     arcsL$from <- as.factor(arcsL$from)
     arcsL$to <-as.factor(arcsL$to)
@@ -121,7 +138,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",mr_model="linear
     dfre <- arrange(dfre,-count)
     return(dfre)
   }
-
+  
   getscore <- function(dfre,exposureName,snp,repeats){
     #exposureName is a str, snp is a vector of str.
     score <- rep(0,length(snp))
@@ -142,142 +159,147 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",mr_model="linear
     return(dfscore)
   }
 
+  options(mc.cores = parallel::detectCores())
+  library(rstan)
+  rstan_options(auto_write = TRUE)
+  library(MendelianRandomization)
+  library(ivreg)
+  
   stanmodelcode <-'
-/* lg_t.stan */
-functions {
-// Vector square root
-vector vecsqrt(vector x) {
-	vector[dims(x)[1]] res;
-	for (m in 1:dims(x)[1]){
-		res[m] = sqrt(x[m]);
-	}
-return res; }
-}
-data {
-  int<lower=0> N;
-  int<lower=0> J;
-  matrix[N,J] Z;
-  vector[N] X;
-  vector[N] Y;
-}
-parameters {
-  real <lower=0> sigmax;
-  real <lower=0> sigmay;
-  real <lower=0> sigmaalpha;
-  real <lower=0> r1_global;
-  real <lower=0> r2_global;
-  real mualpha;
-  real omegax;
-  real omegay;
-  real deltax;
-  real deltay;
-  real theta;
-  vector[N] u;
-  vector[J] z;
-  vector<lower=0>[J] r1_local;
-  vector<lower=0>[J] r2_local;
-  vector[J] alpha;
-}
-transformed parameters {
-   real<lower=0> tau;
-   vector<lower=0> [J] lambda;
-   vector[J] beta;
-   tau      = r1_global * sqrt(r2_global);
-   lambda	  = r1_local .* vecsqrt(r2_local);
-   beta	    =  z .* lambda*tau;
-}
-model {
-  X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
-  Y   ~ normal(omegay+Z*beta+X*theta+u*deltay, sigmay);
-  u 	~ normal(0,1);
-
-  for(k in 1:J){
-    alpha[k] ~ normal(mualpha, sigmaalpha);
-  }
-// Constructing the prior for the lambda vector
-    z ~ normal(0, 1);
-    r1_local ~ normal(0.0, 1.0);
-    r2_local ~ inv_gamma(0.5, 0.5);
-// Constructing the prior for tau
-    r1_global ~ normal(0.0, 1.0);
-    r2_global ~ inv_gamma(0.5, 0.5);
+    /* lg_t.stan */
+    functions {
+    // Vector square root
+    vector vecsqrt(vector x) {
+        vector[dims(x)[1]] res;
+        for (m in 1:dims(x)[1]){
+            res[m] = sqrt(x[m]);
+        }
+    return res; }
     }
-'
-
-  stanmodelcodeLogit <-'
-/* lg_t.stan */
-functions {
-// Vector square root
-vector vecsqrt(vector x) {
-	vector[dims(x)[1]] res;
-	for (m in 1:dims(x)[1]){
-		res[m] = sqrt(x[m]);
-	}
-return res; }
-}
-data {
-  int<lower=0> N;
-  int<lower=0> J;
-  matrix[N,J] Z;
-  vector[N] X;
-  int Y[N];
-}
-parameters {
-  real <lower=0> sigmax;
-  real <lower=0> sigmay;
-  real <lower=0> sigmaalpha;
-  real <lower=0> r1_global;
-  real <lower=0> r2_global;
-  real mualpha;
-  real omegax;
-  real omegay;
-  real deltax;
-  real deltay;
-  real theta;
-  vector[N] u;
-  vector[J] z;
-  vector<lower=0>[J] r1_local;
-  vector<lower=0>[J] r2_local;
-  vector[J] alpha;
-}
-transformed parameters {
-   real<lower=0> tau;
-   vector<lower=0> [J] lambda;
-   vector[J] beta;
-   vector<lower=0>[N] odds;
-   vector<lower=0, upper=1>[N] prob;
-   tau      = r1_global * sqrt(r2_global);
-   lambda	  = r1_local .* vecsqrt(r2_local);
-   beta	    =  z .* lambda*tau;
-   for (i in 1:N){
-       odds[i] = exp(omegay+Z[i]*beta+X[i]*theta+u[i]*deltay);
-       prob[i] = odds[i] / (odds[i] + 1);
-   }
-}
-model {
-  X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
-  Y   ~ bernoulli(prob);
-  u 	~ normal(0,1);
-  for(k in 1:J){
-    alpha[k] ~ normal(mualpha, sigmaalpha);
-  }
-// Constructing the prior for the lambda vector
-    z ~ normal(0, 1);
-    r1_local ~ normal(0.0, 1.0);
-    r2_local ~ inv_gamma(0.5, 0.5);
-// Constructing the prior for tau
-    r1_global ~ normal(0.0, 1.0);
-    r2_global ~ inv_gamma(0.5, 0.5);
+    data {
+    int<lower=0> N;
+    int<lower=0> J;
+    matrix[N,J] Z;
+    vector[N] X;
+    vector[N] Y;
     }
-'
+    parameters {
+    real <lower=0> sigmax;
+    real <lower=0> sigmay;
+    real <lower=0> sigmaalpha;
+    real <lower=0> r1_global;
+    real <lower=0> r2_global;
+    real mualpha;
+    real omegax;
+    real omegay;
+    real deltax;
+    real deltay;
+    real theta;
+    vector[N] u;
+    vector[J] z;
+    vector<lower=0>[J] r1_local;
+    vector<lower=0>[J] r2_local;
+    vector[J] alpha;
+    }
+    transformed parameters {
+    real<lower=0> tau;
+    vector<lower=0> [J] lambda;
+    vector[J] beta;
+    tau      = r1_global * sqrt(r2_global);
+    lambda	  = r1_local .* vecsqrt(r2_local);
+    beta	    =  z .* lambda*tau;
+    }
+    model {
+    X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
+    Y   ~ normal(omegay+Z*beta+X*theta+u*deltay, sigmay);
+    u 	~ normal(0,1);
 
+    for(k in 1:J){
+        alpha[k] ~ normal(mualpha, sigmaalpha);
+    }
+    // Constructing the prior for the lambda vector
+        z ~ normal(0, 1);
+        r1_local ~ normal(0.0, 1.0);
+        r2_local ~ inv_gamma(0.5, 0.5);
+    // Constructing the prior for tau
+        r1_global ~ normal(0.0, 1.0);
+        r2_global ~ inv_gamma(0.5, 0.5);
+        }
+    '
+
+stanmodelcodeLogit <-'
+    /* lg_t.stan */
+    functions {
+    // Vector square root
+    vector vecsqrt(vector x) {
+        vector[dims(x)[1]] res;
+        for (m in 1:dims(x)[1]){
+            res[m] = sqrt(x[m]);
+        }
+    return res; }
+    }
+    data {
+    int<lower=0> N;
+    int<lower=0> J;
+    matrix[N,J] Z;
+    vector[N] X;
+    int Y[N];
+    }
+    parameters {
+    real <lower=0> sigmax;
+    real <lower=0> sigmay;
+    real <lower=0> sigmaalpha;
+    real <lower=0> r1_global;
+    real <lower=0> r2_global;
+    real mualpha;
+    real omegax;
+    real omegay;
+    real deltax;
+    real deltay;
+    real theta;
+    vector[N] u;
+    vector[J] z;
+    vector<lower=0>[J] r1_local;
+    vector<lower=0>[J] r2_local;
+    vector[J] alpha;
+    }
+    transformed parameters {
+    real<lower=0> tau;
+    vector<lower=0> [J] lambda;
+    vector[J] beta;
+    vector<lower=0>[N] odds;
+    vector<lower=0, upper=1>[N] prob;
+    tau      = r1_global * sqrt(r2_global);
+    lambda	  = r1_local .* vecsqrt(r2_local);
+    beta	    =  z .* lambda*tau;
+    for (i in 1:N){
+        odds[i] = exp(omegay+Z[i]*beta+X[i]*theta+u[i]*deltay);
+        prob[i] = odds[i] / (odds[i] + 1);
+    }
+    }
+    model {
+    X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
+    Y   ~ bernoulli(prob);
+    u 	~ normal(0,1);
+    for(k in 1:J){
+        alpha[k] ~ normal(mualpha, sigmaalpha);
+    }
+    // Constructing the prior for the lambda vector
+        z ~ normal(0, 1);
+        r1_local ~ normal(0.0, 1.0);
+        r2_local ~ inv_gamma(0.5, 0.5);
+    // Constructing the prior for tau
+        r1_global ~ normal(0.0, 1.0);
+        r2_global ~ inv_gamma(0.5, 0.5);
+        }
+    '
+	
+  df <- as.data.frame(df) #something will be wrong in converting array for tibble format
   df1 <- df[,c(snp,exposureName)]
   dfsnp <- df[,snp]
   exposure <- df[,exposureName]
   outcome <- df[,outcomeName]
-
   dfre <- BNbootstrap(df1,repeats,nsam,bn_method)
-
   dfscore <- getscore(dfre,exposureName,snp,repeats)
   selectsnp <- dfscore[which(dfscore$score>=cutoff),"snp"]
 
@@ -286,7 +308,7 @@ model {
   J <- length(s)
   X <- array(exposure,dim=N)
   Y <- array(outcome,dim=N)
-  Z <- as.matrix(dfsnp[,s],dim=c(N,J))
+  Z <- as.matrix(df[,s],dim=c(N,J))
   mydata <- list(N=N,J=J,X=X,Y=Y,Z=Z)
 
   betaX <- array(NA, dim=J)
@@ -303,13 +325,16 @@ model {
   }
 
   oggetto = mr_input(bx = as.numeric(betaX),
-                     bxse = as.numeric(sebetaX),
-                     by = as.numeric(betaY),
-                     byse = as.numeric(sebetaY),
-                     correlation = cor(Z),
-                     exposure = "X ", outcome = "Y",
-                     snps = colnames(Z))
-  if(init=="median"){
+                    bxse = as.numeric(sebetaX),
+                    by = as.numeric(betaY),
+                    byse = as.numeric(sebetaY),
+                    correlation = cor(Z),
+                    exposure = "X ", outcome = "Y",
+                    snps = colnames(Z))
+  if(init=="TSLS"){
+    lm = ivreg(outcome~exposure|Z,method="OLS")
+    thetamedianestimate = lm$coefficients[2]
+  }else if(init=="median"){
     if(J<3){
       return(message("median initial needs at least 3 IVs"))
     }
@@ -331,14 +356,14 @@ model {
   }
 
   init_list = list(c1=list(theta=thetamedianestimate,
-                           beta=rep(0,J),alpha=betaX,deltax=0,
-                           deltay=0,u=rep(0,N)))
+                          beta=rep(0,J),alpha=betaX,deltax=0,
+                          deltay=0,u=rep(0,N)))
   if(mr_model=="linear"){
     fit <- stan(model_code=stanmodelcode, init=init_list, iter=n.iter,
                 chains=1, verbose=F,data=mydata)
   }else if(mr_model=="logit"){
     fit <- stan(model_code=stanmodelcodeLogit, init=init_list, iter=n.iter,
-                chains=1, verbose=F,data=mydata)
+                chains=1, cores="mc.cores",verbose=F,data=mydata)
   }else{
     return(message("no this MR model!"))
   }
