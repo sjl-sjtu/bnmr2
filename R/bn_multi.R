@@ -1,4 +1,4 @@
-#' @title Getting suitable genetic IVs for multiple exposures through Bayesian network learning
+#' @title Getting suitable genetic IVs for multiple exposures one by one through Bayesian network learning
 #'
 #' @description is used to get the suitable SNPs as instrumental variables (IVs) of multiple specified exposure by Bayesian network (BN) structure learning.
 #'
@@ -18,13 +18,22 @@
 #' @export
 #'
 #' @examples
-bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,nsam=500){
+bn_multi <- function(df,snp,exposureName,bn_method="hr",cutoff=0.7,repeats=100,nsam=500,sample_replace=TRUE){
   library("bnlearn")
   library("plyr")
   library("dplyr")
-  learnBN <- function(df,nsam,bn_method){
+  library("parallel")
+  learnBN <- function(iter,df,nsam,bn_method){
     n <- nrow(df)
-    iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
+    if(sample_replace==TRUE){
+      iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
+    }else{
+      if(nsam>n){
+          stop("subsample size is larger than the original sample size")
+      }else{
+          iSam <- sample(seq(1,n),size = nsam,replace=FALSE)
+      }
+    }
     dfSam <- df[iSam,]
     rmFlag <- 0
     if(bn_method=="pc.stable"){
@@ -76,7 +85,7 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     }
     return(dfarc)
   }
-
+  
   rmBidire <- function(df){
     df <- arrange(df,from,to)
     for(i in 1:nrow(df)){
@@ -89,9 +98,18 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     }
     return(df)
   }
-
+  
   BNbootstrap <- function(df,repeats,nsam,bn_method){
-    arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
+    cores <- detectCores(logical = FALSE)
+    cl <- makeCluster(cores)
+    clusterEvalQ(cl, {library("bnlearn")
+                      library("plyr")
+                      library("dplyr")
+                      })
+    clusterExport(cl,deparse(substitute(learnBN)),envir=environment())
+    arcsL <- parLapply(cl,seq(repeats),learnBN,df,nsam,bn_method)
+    stopCluster(cl)
+    # arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
     arcsL <- do.call(rbind.fill,arcsL)
     arcsL$from <- as.factor(arcsL$from)
     arcsL$to <-as.factor(arcsL$to)
@@ -101,7 +119,7 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     dfre <- arrange(dfre,-count)
     return(dfre)
   }
-
+  
   getscore <- function(dfre,exposureName,snp,repeats){
     #exposureName is a vector of str, snp is a vector of str.
     dfscoreList <- list()
@@ -126,11 +144,11 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     }
     return(dfscoreList)
   }
-
+  
   df1 <- df[,c(snp,exposureName)]
   dfsnp <- df[,snp]
   exposure <- df[,exposureName]
-
+  
   dfre <- BNbootstrap(df1,repeats,nsam,bn_method)
   dfscore <- getscore(dfre,exposureName,snp,repeats)
   selectsnp <- list()
@@ -138,7 +156,7 @@ bn_multi <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,n
     selectsnp1 <- dfscore[[i]][which(dfscore[[i]]$score>=cutoff),"snp"]
     selectsnp <- append(selectsnp,selectsnp1)
   }
-
+  
   re <- list(IV=selectsnp,score=dfscore)
   return(re)
 }
