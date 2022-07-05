@@ -9,6 +9,7 @@
 #' @param cutoff a numeric between 0 to 1. Those SNPs with score larger than "cutoff" will be chosen as IVs. Default is 0.7.
 #' @param repeats an integer standing for the times of bootstraping. Default is 100.
 #' @param nsam an integer standing for the sample size for bootstraping sampling. Default is 500.
+#' @param sample_replace is a boolean value to determine the sampling methods. TRUE for bootstrapping (with replacement) and FALSE for subsampling (without replacement). Default is TRUE.
 #'
 #' @return a list containing:
 #'
@@ -22,13 +23,22 @@
 #' @examples
 #'
 #'
-bn <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,nsam=500){
+bn <- function(df,snp,exposureName,bn_method="hr",cutoff=0.7,repeats=100,nsam=500,sample_replace=TRUE){
   library("bnlearn")
   library("plyr")
   library("dplyr")
-  learnBN <- function(df,nsam,bn_method){
+  library("parallel")
+  learnBN <- function(iter,df,nsam,bn_method){
     n <- nrow(df)
-    iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
+    if(sample_replace==TRUE){
+      iSam <- sample(seq(1,n),size = nsam,replace=TRUE)
+    }else{
+      if(nsam>n){
+          stop("subsample size is larger than the original sample size")
+      }else{
+          iSam <- sample(seq(1,n),size = nsam,replace=FALSE)
+      }
+    }
     dfSam <- df[iSam,]
     rmFlag <- 0
     if(bn_method=="pc.stable"){
@@ -73,14 +83,12 @@ bn <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,nsam=50
       return(message("no this bn learning method"))
     }
     dfarc <- data.frame(model$arcs)
-    dfarc$from <- as.character(dfarc$from)
-    dfarc$to <- as.character(dfarc$to)
     if(rmFlag==1){
       dfarc <- rmBidire(dfarc)
     }
     return(dfarc)
   }
-
+  
   rmBidire <- function(df){
     df <- arrange(df,from,to)
     for(i in 1:nrow(df)){
@@ -93,9 +101,19 @@ bn <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,nsam=50
     }
     return(df)
   }
-
+  
   BNbootstrap <- function(df,repeats,nsam,bn_method){
-    arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
+    cores <- detectCores(logical = FALSE)
+    cl <- makeCluster(cores)
+    clusterEvalQ(cl, {
+                      library("bnlearn")
+                      library("plyr")
+                      library("dplyr")
+                      })
+    clusterExport(cl,deparse(substitute(learnBN)),envir=environment())
+    arcsL <- parLapply(cl,seq(repeats),learnBN,df,nsam,bn_method)
+    stopCluster(cl)
+    # arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
     arcsL <- do.call(rbind.fill,arcsL)
     arcsL$from <- as.factor(arcsL$from)
     arcsL$to <-as.factor(arcsL$to)
@@ -105,7 +123,7 @@ bn <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,nsam=50
     dfre <- arrange(dfre,-count)
     return(dfre)
   }
-
+  
   getscore <- function(dfre,exposureName,snp,repeats){
     #exposureName is a str, snp is a vector of str.
     score <- rep(0,length(snp))
@@ -125,15 +143,15 @@ bn <- function(df,snp,exposureName,bn_method="hc",cutoff=0.7,repeats=100,nsam=50
     dfscore$snp <- as.character(dfscore$snp)
     return(dfscore)
   }
-
+  
   df1 <- df[,c(snp,exposureName)]
   dfsnp <- df[,snp]
   exposure <- df[,exposureName]
-
+  
   dfre <- BNbootstrap(df1,repeats,nsam,bn_method)
   dfscore <- getscore(dfre,exposureName,snp,repeats)
   selectsnp <- dfscore[which(dfscore$score>=cutoff),"snp"]
-
+  
   re <- list(IV=selectsnp,score=dfscore)
   return(re)
 }
