@@ -9,6 +9,7 @@
 #' @param cutoff a numeric between 0 to 1. Those SNPs with score larger than "cutoff" will be chosen as IVs. Default is 0.7.
 #' @param repeats an integer standing for the times of bootstraping. Default is 100.
 #' @param nsam an integer standing for the sample size for bootstraping sampling. Default is 500.
+#' @param sample_replace is a boolean value to determine the sampling methods. TRUE for bootstrapping (with replacement) and FALSE for subsampling (without replacement). Default is TRUE.
 #'
 #' @return a list containing:
 #'
