@@ -8,10 +8,11 @@ bn(
   df,
   snp,
   exposureName,
-  bn_method = "hc",
+  bn_method = "hr",
   cutoff = 0.7,
   repeats = 100,
-  nsam = 500
+  nsam = 500,
+  sample_replace = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ bn(
 \item{repeats}{an integer standing for the times of bootstraping. Default is 100.}
 
 \item{nsam}{an integer standing for the sample size for bootstraping sampling. Default is 500.}
+
+\item{sample_replace}{is a boolean value to determine the sampling methods. TRUE for bootstrapping (with replacement) and FALSE for subsampling (without replacement). Default is TRUE.}
 }
 \value{
 a list containing:
@@ -40,8 +43,4 @@ a list containing:
 }
 \description{
 is used to get the suitable SNPs as instrumental variables (IVs) of specified exposure by Bayesian network (BN) structure learning.
-}
-\examples{
-
-
 }

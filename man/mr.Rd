@@ -25,7 +25,7 @@ mr(
 
 \item{mr_model}{model for MR. Possible values are "linear" or "logit". Default is "linear".}
 
-\item{init}{the init value of theta for MCMC estimation. It can be a specific numeric or a string of "median", "egger" and "ivw", which means the initial value of the iteration will be calculated automatically by the above method. Default is "median".}
+\item{init}{the init value of theta for MCMC estimation. It can be a specific numeric or a string of "TSLS", "median", "egger" and "ivw", which means the initial value of the iteration will be calculated automatically by the above method. Default is "median".}
 
 \item{n.iter}{an integer standing for the number of iterations. Default is 500.}
 }
@@ -48,8 +48,4 @@ a list containing:
 }
 \description{
 is used to get the causal estimation between exposure and outcome through Bayesian adaptive Mendelian randomization with pleiotropy after IV selection.
-}
-\examples{
-
-
 }
