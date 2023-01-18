@@ -12,28 +12,47 @@
 #' @param n.chain the number of chains in MCMC sampling. Default is 4.
 #'
 #' @return a list containing:
-#'
-#'   betaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
-#'
-#'   mean: the mean estimate of the causal parameter.
-#'
-#'   se: the standard error of the estimation.
-#'
-#'   lower: the lower boundary of the 95% CI of the causal estimation.
-#'
-#'   upper: the upper boundary of the 95% CI of the causal estimation.
-#'
-#'   Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.1).
+#'   \item{betaList}{a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.}
+#'   \item{mean}{the mean estimate of the causal parameter.}
+#'   \item{se}{the standard error of the estimation.}
+#'   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
+#'   \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
+#'   \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
 #'   
 #' @export
 #'
 #' @examples
+#' n <- 2000
+#' p <- 200
+#' snps <- replicate(p,sample(1:3,n,replace = TRUE))
+#' snps <- apply(snps,2,as.numeric)
+#' snpname <- paste0("g",1:p)
+#' df <- as.data.frame(snps)
+#' colnames(df) <- snpname
+#' truesnp <- paste0("g",sample(1:p,50))
+#' df$x <- as.matrix(df[,truesnp])%*%rnorm(50,0.05,0.05)+rnorm(n,0,1)
+#' df$y <- 0.5*df$x+rnorm(n,0,1)
+#' model <- mr(df,truesnp,"x","y")
+
+#' 
 
 mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="horseshoe",init="median",n.iter=5000,n.chain=4){ 
   library(rstan)
   library(MendelianRandomization)
   library(AER)
   library(ivmodel)
+  
+  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+  if (nzchar(chk) && chk == "TRUE") {
+    # use 2 cores in CRAN/Travis/AppVeyor
+    cores <- 2L
+  } else {
+    # use all cores in devtools::test()
+    cores <- parallel::detectCores(logical = FALSE)
+  }
+  
+  options(mc.cores = cores)
+  rstan_options(auto_write = TRUE)
   
   stanmodelcodeHorseshoe <-'
     /* lg_t.stan */
@@ -588,7 +607,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     }else if(init=="ivw"){
       risultato <- mr_allmethods(oggetto, method = "ivw")
       betainitestimate <- risultato$Values[4,2]
-    }else if(class(init)=="numeric"){
+    }else if(is.numeric(init)){
       betainitestimate <- init[1]
     }else{
       stop("no this method to get initial value!")
@@ -631,7 +650,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     }else if(init=="ivw"){
       risultato <- mr_allmethods(oggetto, method = "ivw")
       betainitestimate <- risultato$Values[4,2]
-    }else if(class(init)=="numeric"){
+    }else if(is.numeric(init)){
       betainitestimate <- init[1]
     }else{
       stop("no this method to get initial value!")

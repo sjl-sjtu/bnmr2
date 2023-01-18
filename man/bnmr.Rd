@@ -23,7 +23,7 @@ bnmr(
 )
 }
 \arguments{
-\item{df}{a data frame which contains data of SNPs and specified exposure.}
+\item{df}{a data frame which contains data of SNPs and specified exposure. The values of snps in the data frame should be either numeric or factors (not integers) for BN learning.}
 
 \item{snp}{a vector of string belonging to column names of df, which is the name of SNPs included in BN structure learning.}
 
@@ -55,23 +55,29 @@ bnmr(
 }
 \value{
 a list containing:
-
-  selectsnp: a vector of string containing the colnames of df corresponding to selected SNPs.
-
-  dfscore: a data frame containing the score calculated for each SNP.
-
-  betaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
-
-  mean: the mean estimate of the causal parameter.
-
-  se: the standard error of the estimation.
-
-  lower: the lower boundary of the 95% CI of the causal estimation.
-
-  upper: the upper boundary of the 95% CI of the causal estimation.
-
-  Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.1).
+  \item{selectsnp}{a vector of string containing the colnames of df corresponding to selected SNPs.}
+  \item{dfscore}{a data frame containing the score calculated for each SNP.}
+  \item{betaList}{a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.}
+  \item{mean}{the mean estimate of the causal parameter.}
+  \item{se}{the standard error of the estimation.}
+  \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
+  \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
+  \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
 }
 \description{
 Title Causal inference between traits using the Bayesian Network-based Mendelian randomization
+}
+\examples{
+n <- 2000
+p <- 200
+snps <- replicate(p,sample(1:3,n,replace = TRUE))
+snps <- apply(snps,2,as.numeric)
+snpname <- paste0("g",1:p)
+df <- as.data.frame(snps)
+colnames(df) <- snpname
+truesnp <- paste0("g",sample(1:p,50))
+df$x <- as.matrix(df[,truesnp])\%*\%rnorm(50,0.05,0.05)+rnorm(n,0,1)
+df$y <- 0.5*df$x+rnorm(n,0,1)
+model <- bnmr(df,snpname,"x","y")
+
 }

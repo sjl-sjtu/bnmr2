@@ -17,7 +17,7 @@ bn(
 )
 }
 \arguments{
-\item{df}{a data frame which contains data of SNPs and specified exposure.}
+\item{df}{a data frame which contains data of SNPs and specified exposure. The values of snps in the data frame should be either numeric or factors (not integers) for BN learning.}
 
 \item{snp}{a vector of string belonging to column names of df, which is the name of SNPs included in BN structure learning.}
 
@@ -37,13 +37,24 @@ bn(
 }
 \value{
 a list containing:
-
-  selectsnp: a vector of string containing the colnames of df corresponding to
-
-  selected SNPs.
-
-  dfscore: a data frame containing the score calculated for each SNP.
+  \item{selectsnp}{a vector of string containing the colnames of df corresponding to selected SNPs.}
+  \item{dfscore}{a data frame containing the score calculated for each SNP.}
 }
 \description{
 Title Getting suitable genetic IVs through random graph forest, which is based on Bayesian network structure learning
+}
+\examples{
+n <- 2000
+p <- 200
+snps <- replicate(p,sample(1:3,n,replace = TRUE))
+snps <- apply(snps,2,as.numeric)
+snpname <- paste0("g",1:p)
+df <- as.data.frame(snps)
+colnames(df) <- snpname
+truesnp <- paste0("g",sample(1:p,50))
+df$x <- as.matrix(df[,truesnp])\%*\%rnorm(50,0.05,0.05)+rnorm(n,0,1)
+df$y <- 0.5*df$x+rnorm(n,0,1)
+
+model <- bn(df,snpname,"x")
+
 }

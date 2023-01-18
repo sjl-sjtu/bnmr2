@@ -1,6 +1,6 @@
 #' Title Getting suitable genetic IVs through random graph forest, which is based on Bayesian network structure learning
 #'
-#' @param df a data frame which contains data of SNPs and specified exposure.
+#' @param df a data frame which contains data of SNPs and specified exposure. The values of snps in the data frame should be either numeric or factors (not integers) for BN learning.
 #' @param snp a vector of string belonging to column names of df, which is the name of SNPs included in BN structure learning.
 #' @param exposureName a string which is a colname of df corresponding to the exposure studied.
 #' @param bn_method method for BN structure learning. Possible values are the function name of structure learning algorithm implemented in bnlearn. Default is "hc".
@@ -11,21 +11,40 @@
 #' @param sample_replace is a boolean value to determine the sampling methods for individuals. TRUE with replacement and FALSE without replacement. Default is TRUE.
 #'
 #' @return a list containing:
-#'
-#'   selectsnp: a vector of string containing the colnames of df corresponding to
-#'
-#'   selected SNPs.
-#'
-#'   dfscore: a data frame containing the score calculated for each SNP.
+#'   \item{selectsnp}{a vector of string containing the colnames of df corresponding to selected SNPs.}
+#'   \item{dfscore}{a data frame containing the score calculated for each SNP.}
 #'   
 #' @export
 #'
 #' @examples
+#' n <- 2000
+#' p <- 200
+#' snps <- replicate(p,sample(1:3,n,replace = TRUE))
+#' snps <- apply(snps,2,as.numeric)
+#' snpname <- paste0("g",1:p)
+#' df <- as.data.frame(snps)
+#' colnames(df) <- snpname
+#' truesnp <- paste0("g",sample(1:p,50))
+#' df$x <- as.matrix(df[,truesnp])%*%rnorm(50,0.05,0.05)+rnorm(n,0,1)
+#' df$y <- 0.5*df$x+rnorm(n,0,1)
+#' 
+#' model <- bn(df,snpname,"x")
+#' 
 bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=50,nsam=1000,psam=100,sample_replace=TRUE){
   library("bnlearn")
   library("plyr")
   library("dplyr")
   library("parallel")
+  
+  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+  if (nzchar(chk) && chk == "TRUE") {
+    # use 2 cores in CRAN/Travis/AppVeyor
+    cores <- 2L
+  } else {
+    # use all cores in devtools::test()
+    cores <- parallel::detectCores(logical = FALSE)
+  }
+  
   learnBN <- function(iter,df,snp,exposureName,nsam,psam,bn_method,sample_replace){
     n <- nrow(df)
     if(sample_replace==TRUE){
@@ -60,11 +79,7 @@ bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=50,nsam
       model <- inter.iamb(dfSam, undirected = TRUE)
       rmFlag = 1
     }else if(bn_method=="iamb.fdr"){
-      cores1 <- detectCores(logical = FALSE)
-      cl1 <- makeCluster(cores1)
-      model <- iamb.fdr(dfSam, cl1, undirected = TRUE)
-      rmFlag = 1
-      stopCluster(cl1)
+      model <- iamb.fdr(dfSam, undirected = TRUE)
     }else if(bn_method=="hc"){
       model <- hc(dfSam)
     }else if(bn_method=="tabu"){
@@ -128,7 +143,6 @@ bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=50,nsam
   }
   
   BNbootstrap <- function(df,snp,exposureName,repeats,nsam,psam,bn_method,sample_replace){
-    cores <- detectCores(logical = FALSE)
     cl <- makeCluster(cores)
     clusterEvalQ(cl, {library("bnlearn")
       library("plyr")

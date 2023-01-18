@@ -37,19 +37,27 @@ mr(
 }
 \value{
 a list containing:
-
-  betaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
-
-  mean: the mean estimate of the causal parameter.
-
-  se: the standard error of the estimation.
-
-  lower: the lower boundary of the 95% CI of the causal estimation.
-
-  upper: the upper boundary of the 95% CI of the causal estimation.
-
-  Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.1).
+  \item{betaList}{a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.}
+  \item{mean}{the mean estimate of the causal parameter.}
+  \item{se}{the standard error of the estimation.}
+  \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
+  \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
+  \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
 }
 \description{
 Title Causal estimation by Bayesian Mendelian randomization with shrinkage prior to cope with pleiotropy
+}
+\examples{
+n <- 2000
+p <- 200
+snps <- replicate(p,sample(1:3,n,replace = TRUE))
+snps <- apply(snps,2,as.numeric)
+snpname <- paste0("g",1:p)
+df <- as.data.frame(snps)
+colnames(df) <- snpname
+truesnp <- paste0("g",sample(1:p,50))
+df$x <- as.matrix(df[,truesnp])\%*\%rnorm(50,0.05,0.05)+rnorm(n,0,1)
+df$y <- 0.5*df$x+rnorm(n,0,1)
+model <- mr(df,truesnp,"x","y")
+
 }
