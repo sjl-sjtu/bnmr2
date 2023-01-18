@@ -2,35 +2,38 @@
 % Please edit documentation in R/bn.R
 \name{bn}
 \alias{bn}
-\title{Getting suitable genetic IVs through Bayesian network learning}
+\title{Title Getting suitable genetic IVs through random graph forest, which is based on Bayesian network structure learning}
 \usage{
 bn(
   df,
   snp,
   exposureName,
-  bn_method = "hr",
-  cutoff = 0.7,
-  repeats = 100,
-  nsam = 500,
+  bn_method = "hc",
+  repeats = 1000,
+  selectNum = 50,
+  nsam = 1000,
+  psam = 100,
   sample_replace = TRUE
 )
 }
 \arguments{
 \item{df}{a data frame which contains data of SNPs and specified exposure.}
 
-\item{snp}{a vector of string belonging to colnames of df, which is the name of SNPs included in BN structure learning.}
+\item{snp}{a vector of string belonging to column names of df, which is the name of SNPs included in BN structure learning.}
 
 \item{exposureName}{a string which is a colname of df corresponding to the exposure studied.}
 
 \item{bn_method}{method for BN structure learning. Possible values are the function name of structure learning algorithm implemented in bnlearn. Default is "hc".}
 
-\item{cutoff}{a numeric between 0 to 1. Those SNPs with score larger than "cutoff" will be chosen as IVs. Default is 0.7.}
+\item{repeats}{an integer standing for the number of subsamples or bootstraps. Default is 1000.}
 
-\item{repeats}{an integer standing for the times of bootstraping. Default is 100.}
+\item{selectNum}{the number of instrument to select. Default is 50.}
 
-\item{nsam}{an integer standing for the sample size for bootstraping sampling. Default is 500.}
+\item{nsam}{the size of individuals in each subsample of random graph forest. Default is 1000.}
 
-\item{sample_replace}{is a boolean value to determine the sampling methods. TRUE for bootstrapping (with replacement) and FALSE for subsampling (without replacement). Default is TRUE.}
+\item{psam}{the size of variants in each subsample of random graph forest. Default is 100.}
+
+\item{sample_replace}{is a boolean value to determine the sampling methods for individuals. TRUE with replacement and FALSE without replacement. Default is TRUE.}
 }
 \value{
 a list containing:
@@ -42,5 +45,5 @@ a list containing:
   dfscore: a data frame containing the score calculated for each SNP.
 }
 \description{
-is used to get the suitable SNPs as instrumental variables (IVs) of specified exposure by Bayesian network (BN) structure learning.
+Title Getting suitable genetic IVs through random graph forest, which is based on Bayesian network structure learning
 }

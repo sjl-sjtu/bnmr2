@@ -1,10 +1,10 @@
 Package: bnmr
 Type: Package
-Title: A package to conduct Bayesian Mendelian randomization based on Bayesian Network using GWAS data
+Title: A package to conduct Bayesian Network-based Mendelian randomization using individual-level GWAS data
 Version: 0.1.0
 Author: Sun Jianle
 Maintainer: The package maintainer <sjl-2017@sjtu.edu.cn>
-Description: A package to conduct causal estimation between exposure and outcome across GWAS data using BNMR model, including the variants filtering via Bayesian network in the learning stage, as well as the effect size estimation through a revised Bayesian Mendelian randomization framework with imperfect instruments in the inference stage.
+Description: A package to conduct causal estimation between exposure and outcome across GWAS data using BNMR model, including the variants filtering via random graph forest in the learning stage, as well as the effect size estimation through Bayesian Mendelian randomization with shrinkage prior in the inference stage.
 License: GPL
 Encoding: UTF-8
 LazyData: False
@@ -13,5 +13,8 @@ Imports:
     rstan,
     MendelianRandomization,
     plyr,
-    dplyr
-RoxygenNote: 7.2.0
+    dplyr,
+	AER,
+	ivmodel,
+	parallel
+RoxygenNote: 7.2.1

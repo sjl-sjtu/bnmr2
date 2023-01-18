@@ -2,7 +2,7 @@
 % Please edit documentation in R/bnmr.R
 \name{bnmr}
 \alias{bnmr}
-\title{Bayesian Mendelian randomization based on Bayesian network}
+\title{Title Causal inference between traits using the Bayesian Network-based Mendelian randomization}
 \usage{
 bnmr(
   df,
@@ -10,39 +10,48 @@ bnmr(
   exposureName,
   outcomeName,
   bn_method = "hc",
-  mr_model = "linear",
-  cutoff = 0.7,
-  repeats = 100,
-  nsam = 500,
+  repeats = 1000,
+  selectNum = 50,
+  nsam = 1000,
+  psam = 100,
   sample_replace = TRUE,
+  mr_model = "linear",
+  prior = "horseshoe",
   init = "median",
-  n.iter = 500
+  n.iter = 5000,
+  n.chain = 4
 )
 }
 \arguments{
-\item{df}{a data frame which contains data of SNPs, specified exposure and outcome.}
+\item{df}{a data frame which contains data of SNPs and specified exposure.}
 
-\item{snp}{a vector of string belonging to colnames of df, which is the name of SNPs included in BN structure learning.}
+\item{snp}{a vector of string belonging to column names of df, which is the name of SNPs included in BN structure learning.}
 
 \item{exposureName}{a string which is a colname of df corresponding to the exposure studied.}
 
-\item{outcomeName}{a string which is a colname of df corresponding to the outcome studied.}
+\item{outcomeName}{a string which is a column name of df corresponding to the outcome studied.}
 
 \item{bn_method}{method for BN structure learning. Possible values are the function name of structure learning algorithm implemented in bnlearn. Default is "hc".}
 
+\item{repeats}{an integer standing for the number of subsamples or bootstraps. Default is 1000.}
+
+\item{selectNum}{the number of instrument to select. Default is 50.}
+
+\item{nsam}{the size of individuals in each subsample of random graph forest. Default is 1000.}
+
+\item{psam}{the size of variants in each subsample of random graph forest. Default is 100.}
+
+\item{sample_replace}{is a boolean value to determine the sampling methods for individuals. TRUE with replacement and FALSE without replacement. Default is TRUE.}
+
 \item{mr_model}{model for MR. Possible values are "linear" or "logit". Default is "linear".}
 
-\item{cutoff}{a numeric between 0 to 1. Those SNPs with score larger than "cutoff" will be chosen as IVs. Default is 0.7.}
+\item{prior}{a string represented shrinkage prior used in estimation. It can be "horseshoe", "lasso", "hyperlasso", "spikeslabBernoulli", "spikeslabUniform". Default is "horseshoe".}
 
-\item{repeats}{an integer standing for the times of bootstraping. Default is 100.}
+\item{init}{the init value of theta for MCMC estimation. It can be a specific numeric or a string of "TSLS", "median", "egger" and "ivw", which means the initial value of the iteration will be calculated automatically by the above method. Default is "median".}
 
-\item{nsam}{an integer standing for the sample size for bootstraping sampling. Default is 500.}
+\item{n.iter}{an integer standing for the number of iterations. Default is 5000.}
 
-\item{sample_replace}{is a boolean value to determine the sampling methods. TRUE for bootstrapping (with replacement) and FALSE for subsampling (without replacement). Default is TRUE.}
-
-\item{init}{the init value of theta for MCMC estimation. It can be a specific numeric or a string of "median", "egger" and "ivw", which means the initial value of the iteration will be calculated automatically by the above method. Default is "median".}
-
-\item{n.iter}{an integer standing for the number of iterations. Default is 500.}
+\item{n.chain}{the number of chains in MCMC sampling. Default is 4.}
 }
 \value{
 a list containing:
@@ -51,20 +60,18 @@ a list containing:
 
   dfscore: a data frame containing the score calculated for each SNP.
 
-  thetaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
+  betaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
 
   mean: the mean estimate of the causal parameter.
 
-  se: the SE of the estimation.
-
-  sd: the SD of the estimation.
+  se: the standard error of the estimation.
 
   lower: the lower boundary of the 95% CI of the causal estimation.
 
   upper: the upper boundary of the 95% CI of the causal estimation.
 
-  Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.05).
+  Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.1).
 }
 \description{
-to get the causal estimation between exposure and outcome in the presence of pleiotropy by learning Bayesian network structure on GWAS data to get suitable genetic IVs for adaptive Mendelian randomization.
+Title Causal inference between traits using the Bayesian Network-based Mendelian randomization
 }

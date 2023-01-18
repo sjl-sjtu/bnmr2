@@ -2,7 +2,7 @@
 % Please edit documentation in R/mr.R
 \name{mr}
 \alias{mr}
-\title{Causal estimation by adaptive Bayesian Mendelian randomization with pleiotropy}
+\title{Title Causal estimation by Bayesian Mendelian randomization with shrinkage prior to cope with pleiotropy}
 \usage{
 mr(
   df,
@@ -10,42 +10,46 @@ mr(
   exposureName,
   outcomeName,
   mr_model = "linear",
+  prior = "horseshoe",
   init = "median",
-  n.iter = 500
+  n.iter = 5000,
+  n.chain = 4
 )
 }
 \arguments{
 \item{df}{a data frame which contains data of IVs, specified exposure and outcome.}
 
-\item{selectsnp}{a vector of string containing the colnames of df corresponding to the IV used in MR.}
+\item{selectsnp}{a vector of string containing the column names of df corresponding to the IV used in MR.}
 
-\item{exposureName}{a string which is a colname of df corresponding to the exposure studied.}
+\item{exposureName}{a string which is a column name of df corresponding to the exposure studied.}
 
-\item{outcomeName}{a string which is a colname of df corresponding to the outcome studied.}
+\item{outcomeName}{a string which is a column name of df corresponding to the outcome studied.}
 
 \item{mr_model}{model for MR. Possible values are "linear" or "logit". Default is "linear".}
 
+\item{prior}{a string represented shrinkage prior used in estimation. It can be "horseshoe", "lasso", "hyperlasso", "spikeslabBernoulli", "spikeslabUniform". Default is "horseshoe".}
+
 \item{init}{the init value of theta for MCMC estimation. It can be a specific numeric or a string of "TSLS", "median", "egger" and "ivw", which means the initial value of the iteration will be calculated automatically by the above method. Default is "median".}
 
-\item{n.iter}{an integer standing for the number of iterations. Default is 500.}
+\item{n.iter}{an integer standing for the number of iterations. Default is 5000.}
+
+\item{n.chain}{the number of chains in MCMC sampling. Default is 4.}
 }
 \value{
 a list containing:
 
-  thetaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
+  betaList: a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.
 
   mean: the mean estimate of the causal parameter.
 
-  se: the SE of the estimation.
-
-  sd: the SD of the estimation.
+  se: the standard error of the estimation.
 
   lower: the lower boundary of the 95% CI of the causal estimation.
 
   upper: the upper boundary of the 95% CI of the causal estimation.
 
-  Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.05).
+  Rhat: a indicator to measure the convergence (at convergence, Rhat <= 1.1).
 }
 \description{
-is used to get the causal estimation between exposure and outcome through Bayesian adaptive Mendelian randomization with pleiotropy after IV selection.
+Title Causal estimation by Bayesian Mendelian randomization with shrinkage prior to cope with pleiotropy
 }
