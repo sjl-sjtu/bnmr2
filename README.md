@@ -6,3 +6,8 @@ You can install the package as the following:
 library(devtools)
 devtools::install_github("sjl-sjtu/bnmr")
 ```
+
+Usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.1.0.pdf.
+
+Latest updation at Feb. 24th, 2023.
+Contact me: Jianle Sun (sjl-2017@sjtu.edu.cn)
