@@ -25,7 +25,8 @@
 #'   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
 #'   \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
 #'   \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
-#'   
+#'   \item{fit_detail}{An object of S4 class stanfit containing the details of Bayesian MR estimation}
+#'
 #' @export
 #'
 #' @examples
@@ -40,7 +41,7 @@
 #' df$x <- as.matrix(df[,truesnp])%*%rnorm(50,0.05,0.05)+rnorm(n,0,1)
 #' df$y <- 0.5*df$x+rnorm(n,0,1)
 #' model <- bnmr(df,snpname,"x","y")
-#' 
+#'
 bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,selectNum=50,nsam=1000,psam=100,sample_replace=TRUE,mr_model="linear",prior="horseshoe",init="median",n.iter=5000,n.chain=4){
   library(bnlearn)
   library(plyr)
@@ -50,7 +51,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
   library(MendelianRandomization)
   library(AER)
   library(ivmodel)
-  
+
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
   if (nzchar(chk) && chk == "TRUE") {
     # use 2 cores in CRAN/Travis/AppVeyor
@@ -59,10 +60,10 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     # use all cores in devtools::test()
     cores <- parallel::detectCores(logical = FALSE)
   }
-  
+
   options(mc.cores = cores)
   rstan_options(auto_write = TRUE)
-  
+
   learnBN <- function(iter,df,snp,exposureName,nsam,psam,bn_method,sample_replace){
     n <- nrow(df)
     if(sample_replace==TRUE){
@@ -128,7 +129,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     }
     return(dfarc)
   }
-  
+
   rmBidire <- function(df){
     df <- arrange(df,from,to)
     for(i in 1:nrow(df)){
@@ -141,7 +142,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     }
     return(df)
   }
-  
+
   getscore <- function(dfre,exposureName,snp,repeats){
     #exposureName is a str, snp is a vector of str.
     calc <- function(sn) {
@@ -160,7 +161,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     dfscore$snp <- as.character(dfscore$snp)
     return(dfscore)
   }
-  
+
   BNbootstrap <- function(df,snp,exposureName,repeats,nsam,psam,bn_method,sample_replace){
     cl <- makeCluster(cores)
     clusterEvalQ(cl, {library("bnlearn")
@@ -181,7 +182,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     dfre <- arrange(dfre,-count)
     return(dfre)
   }
-  
+
   stanmodelcodeHorseshoe <-'
     /* lg_t.stan */
     functions {
@@ -220,7 +221,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
             phi[k] ~ cauchy(0, 1);
@@ -230,7 +231,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
             tau ~ cauchy(0, 1);
         }
     '
-  
+
   stanmodelcodeSpikeSlabUniform <-'
     /* lg_t.stan */
     functions {
@@ -269,7 +270,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
             lambda[k] ~ uniform(0,1);
@@ -279,7 +280,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
         }
     }
     '
-  
+
   stanmodelcodeSpikeSlabBernoulli <-'
     /* lg_t.stan */
     functions {
@@ -319,17 +320,17 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
-            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001), 
+            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001),
  						  bernoulli_lpmf(1 | pi) + normal_lpdf(gamma[k] | 0, tau[k]));
  						//prior for tau
             tau[k]  ~  inv_gamma(0.5,0.5);
         }
     }
     '
-  
+
   stanmodelcodeLasso <-'
     /* lg_t.stan */
     functions {
@@ -369,16 +370,16 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
-            alpha[k] ~ normal(mualpha, sigmaalpha);           
+            alpha[k] ~ normal(mualpha, sigmaalpha);
             gamma[k] ~ double_exponential(0,1/lambda);
         }
         // prior for lambda
         lambda ~ cauchy(0,1);
     }
     '
-  
+
   stanmodelcodeHyperlasso <-'
     /* lg_t.stan */
     functions {
@@ -419,9 +420,9 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
-            alpha[k] ~ normal(mualpha, sigmaalpha);           
+            alpha[k] ~ normal(mualpha, sigmaalpha);
             gamma[k] ~ double_exponential(0,sqrt(2*tau[k]));
             tau[k] ~ gamma(0.5,1/lambda^2);
         }
@@ -429,8 +430,8 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
         lambda ~ cauchy(0,1);
     }
     '
-  
-  
+
+
   stanmodelcodeLogitHorseshoe <-'
     /* lg_t.stan */
     functions {
@@ -478,7 +479,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
           tau ~ cauchy(0, 1);
     }
     '
-  
+
   stanmodelcodeLogitSpikeSlabUniform <-'
     /* lg_t.stan */
     functions {
@@ -526,7 +527,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
         }
     }
     '
-  
+
   stanmodelcodeLogitSpikeSlabBernoulli <-'
     /* lg_t.stan */
     functions {
@@ -568,14 +569,14 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
       u 	~ normal(0,1);
       for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
-            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001), 
+            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001),
  						  bernoulli_lpmf(1 | pi) + normal_lpdf(gamma[k] | 0, tau[k]));
  						//prior for tau
             tau[k]  ~  inv_gamma(0.5,0.5);
         }
     }
-    ' 
-  
+    '
+
   stanmodelcodeLogitLasso <-'
     /* lg_t.stan */
     functions {
@@ -616,14 +617,14 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
       Y   ~ bernoulli_logit(omegay+Z*gamma+X*beta+u*deltay);
       u 	~ normal(0,1);
       for(k in 1:J){
-            alpha[k] ~ normal(mualpha, sigmaalpha);           
+            alpha[k] ~ normal(mualpha, sigmaalpha);
             gamma[k] ~ double_exponential(0,1/lambda);
         }
         // prior for lambda
         lambda ~ cauchy(0,1);
     }
     '
-  
+
   stanmodelcodeLogitHyperlasso <-'
     /* lg_t.stan */
     functions {
@@ -665,7 +666,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
       Y   ~ bernoulli_logit(omegay+Z*gamma+X*beta+u*deltay);
       u 	~ normal(0,1);
       for(k in 1:J){
-            alpha[k] ~ normal(mualpha, sigmaalpha);           
+            alpha[k] ~ normal(mualpha, sigmaalpha);
             gamma[k] ~ double_exponential(0,sqrt(2*tau[k]));
             tau[k] ~ gamma(0.5,1/lambda^2);
         }
@@ -673,13 +674,13 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
         lambda ~ cauchy(0,1);
     }
     '
-  
+
   df <- as.data.frame(df)
   df <- df[,c(snp,exposureName)]
   dfsnp <- df[,snp]
   exposure <- df[,exposureName]
   dfre <- BNbootstrap(df,snp,exposureName,repeats,nsam,psam,bn_method,sample_replace)
-  
+
   dfscore <- getscore(dfre,exposureName,snp,repeats)
   dfscore <- arrange(dfscore,desc(score))
   selectsnp <- dfscore[1:selectNum,"snp"]
@@ -698,7 +699,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
   betaY <- array(NA, dim=J)
   sebetaY <- array(NA, dim=J)
   sebetaX <- array(NA, dim=J)
-  
+
   if(mr_model=="linear"){
     for(isnp in 1:J){
       regX <- lm(X ~ Z[,isnp])
@@ -793,8 +794,8 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
   }else{
     stop("no this MR model!")
   }
-  
-  
+
+
   init_list <- list(c1=list(beta=betainitestimate,
                             gamma=rep(0,J),alpha=betaX,deltax=0,
                             deltay=0,u=rep(0,N)))

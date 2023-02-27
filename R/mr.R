@@ -18,7 +18,8 @@
 #'   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
 #'   \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
 #'   \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
-#'   
+#'   \item{fit_detail}{An object of S4 class stanfit containing the details of Bayesian MR estimation}
+#'
 #' @export
 #'
 #' @examples
@@ -34,14 +35,14 @@
 #' df$y <- 0.5*df$x+rnorm(n,0,1)
 #' model <- mr(df,truesnp,"x","y")
 
-#' 
+#'
 
-mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="horseshoe",init="median",n.iter=5000,n.chain=4){ 
+mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="horseshoe",init="median",n.iter=5000,n.chain=4){
   library(rstan)
   library(MendelianRandomization)
   library(AER)
   library(ivmodel)
-  
+
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
   if (nzchar(chk) && chk == "TRUE") {
     # use 2 cores in CRAN/Travis/AppVeyor
@@ -50,10 +51,10 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     # use all cores in devtools::test()
     cores <- parallel::detectCores(logical = FALSE)
   }
-  
+
   options(mc.cores = cores)
   rstan_options(auto_write = TRUE)
-  
+
   stanmodelcodeHorseshoe <-'
     /* lg_t.stan */
     functions {
@@ -92,7 +93,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
             phi[k] ~ cauchy(0, 1);
@@ -102,7 +103,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
             tau ~ cauchy(0, 1);
         }
     '
-  
+
   stanmodelcodeSpikeSlabUniform <-'
     /* lg_t.stan */
     functions {
@@ -141,7 +142,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
             lambda[k] ~ uniform(0,1);
@@ -151,7 +152,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
         }
     }
     '
-  
+
   stanmodelcodeSpikeSlabBernoulli <-'
     /* lg_t.stan */
     functions {
@@ -191,17 +192,17 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
-            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001), 
+            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001),
  						  bernoulli_lpmf(1 | pi) + normal_lpdf(gamma[k] | 0, tau[k]));
  						//prior for tau
             tau[k]  ~  inv_gamma(0.5,0.5);
         }
     }
     '
-  
+
   stanmodelcodeLasso <-'
     /* lg_t.stan */
     functions {
@@ -241,16 +242,16 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
-            alpha[k] ~ normal(mualpha, sigmaalpha);           
+            alpha[k] ~ normal(mualpha, sigmaalpha);
             gamma[k] ~ double_exponential(0,1/lambda);
         }
         // prior for lambda
         lambda ~ cauchy(0,1);
     }
     '
-  
+
   stanmodelcodeHyperlasso <-'
     /* lg_t.stan */
     functions {
@@ -291,9 +292,9 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     model {
         X 	~ normal(omegax+Z*alpha+u*deltax, sigmax);
         Y   ~ normal(omegay+Z*gamma+X*beta+u*deltay, sigmay);
-        u 	~ normal(0,1);    
+        u 	~ normal(0,1);
         for(k in 1:J){
-            alpha[k] ~ normal(mualpha, sigmaalpha);           
+            alpha[k] ~ normal(mualpha, sigmaalpha);
             gamma[k] ~ double_exponential(0,sqrt(2*tau[k]));
             tau[k] ~ gamma(0.5,1/lambda^2);
         }
@@ -301,8 +302,8 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
         lambda ~ cauchy(0,1);
     }
     '
-  
-  
+
+
   stanmodelcodeLogitHorseshoe <-'
     /* lg_t.stan */
     functions {
@@ -398,7 +399,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
         }
     }
     '
-  
+
   stanmodelcodeLogitSpikeSlabBernoulli <-'
     /* lg_t.stan */
     functions {
@@ -440,13 +441,13 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       u 	~ normal(0,1);
       for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
-            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001), 
+            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001),
  						  bernoulli_lpmf(1 | pi) + normal_lpdf(gamma[k] | 0, tau[k]));
  						//prior for tau
             tau[k]  ~  inv_gamma(0.5,0.5);
         }
     }
-    ' 
+    '
 
   stanmodelcodeLogitLasso <-'
     /* lg_t.stan */
@@ -488,7 +489,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       Y   ~ bernoulli_logit(omegay+Z*gamma+X*beta+u*deltay);
       u 	~ normal(0,1);
       for(k in 1:J){
-            alpha[k] ~ normal(mualpha, sigmaalpha);           
+            alpha[k] ~ normal(mualpha, sigmaalpha);
             gamma[k] ~ double_exponential(0,1/lambda);
         }
         // prior for lambda
@@ -537,7 +538,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       Y   ~ bernoulli_logit(omegay+Z*gamma+X*beta+u*deltay);
       u 	~ normal(0,1);
       for(k in 1:J){
-            alpha[k] ~ normal(mualpha, sigmaalpha);           
+            alpha[k] ~ normal(mualpha, sigmaalpha);
             gamma[k] ~ double_exponential(0,sqrt(2*tau[k]));
             tau[k] ~ gamma(0.5,1/lambda^2);
         }
@@ -545,7 +546,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
         lambda ~ cauchy(0,1);
     }
     '
-  
+
   df <- as.data.frame(df) #something will be wrong in converting array for tibble format
   exposure <- df[,exposureName]
   outcome <- df[,outcomeName]
@@ -556,12 +557,12 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
   Y <- array(outcome,dim=N)
   Z <- as.matrix(df[,s],dim=c(N,J))
   mydata <- list(N=N,J=J,X=X,Y=Y,Z=Z)
-  
+
   betaX <- array(NA, dim=J)
   betaY <- array(NA, dim=J)
   sebetaY <- array(NA, dim=J)
   sebetaX <- array(NA, dim=J)
-  
+
   if(mr_model=="linear"){
     for(isnp in 1:J){
       regX <- lm(X ~ Z[,isnp])
@@ -571,7 +572,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       betaY[isnp] <- summary(regY)$coefficients[2,1]
       sebetaY[isnp] <- summary(regY)$coefficients[2,2]
     }
-    
+
     oggetto <- mr_input(bx = as.numeric(betaX),
                         bxse = as.numeric(sebetaX),
                         by = as.numeric(betaY),
@@ -621,7 +622,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       betaY[isnp] <- summary(regY)$coefficients[2,1]
       sebetaY[isnp] <- summary(regY)$coefficients[2,2]
     }
-    
+
     oggetto <- mr_input(bx = as.numeric(betaX),
                         bxse = as.numeric(sebetaX),
                         by = as.numeric(betaY),
@@ -659,7 +660,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     stop("no this MR model!")
   }
 
-  
+
   init_list <- list(c1=list(beta=betainitestimate,
                             gamma=rep(0,J),alpha=betaX,deltax=0,
                             deltay=0,u=rep(0,N)))
@@ -705,7 +706,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
   }else{
     stop("no this MR model!")
   }
-  
+
   beta <- rstan::extract(fit,pars='beta',permuted=FALSE)
   mobeta <- monitor(beta,digits_summary=5)
   re <- list(betaList=beta,mean=mobeta$mean,se=mobeta$sd,

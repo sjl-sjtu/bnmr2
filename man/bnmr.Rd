@@ -63,6 +63,7 @@ a list containing:
   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
   \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
   \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
+  \item{fit_detail}{An object of S4 class stanfit containing the details of Bayesian MR estimation}
 }
 \description{
 Title Causal inference between traits using the Bayesian Network-based Mendelian randomization
