@@ -12,5 +12,5 @@ devtools::install_github("sjl-sjtu/bnmr")
 
 Usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.0.pdf.
 
-Latest updation at Feb. 24th, 2023.
+Latest updation at Feb. 27th, 2023.
 Contact me: Jianle Sun (sjl-2017@sjtu.edu.cn)
