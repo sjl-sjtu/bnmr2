@@ -5,7 +5,8 @@
 #' @param exposureName a string which is a colname of df corresponding to the exposure studied.
 #' @param bn_method method for BN structure learning. Possible values are the function name of structure learning algorithm implemented in bnlearn. Default is "hc".
 #' @param repeats an integer standing for the number of subsamples or bootstraps. Default is 1000.
-#' @param selectNum the number of instrument to select. Default is 50.
+#' @param selectNum the number of instrument to select. Default is NA.
+#' @param alpha we will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.9. 
 #' @param nsam the size of individuals in each subsample of random graph forest. Default is 1000.
 #' @param psam the size of variants in each subsample of random graph forest. Default is 100.
 #' @param sample_replace is a boolean value to determine the sampling methods for individuals. TRUE with replacement and FALSE without replacement. Default is TRUE.
@@ -30,7 +31,7 @@
 #' 
 #' model <- bn(df,snpname,"x")
 #' 
-bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=50,nsam=1000,psam=100,sample_replace=TRUE){
+bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=NA,alpha=0.9,nsam=1000,psam=100,sample_replace=TRUE){
   library("bnlearn")
   library("plyr")
   library("dplyr")
@@ -170,7 +171,12 @@ bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=50,nsam
   
   dfscore <- getscore(dfre,exposureName,snp,repeats)
   dfscore <- arrange(dfscore,desc(score))
-  selectsnp <- dfscore[1:selectNum,"snp"]
+  
+  if(!is.na(selectNum){
+    selectsnp <- dfscore[1:selectNum,"snp"]
+  }else{
+    selectsnp <- dfscore%>%filter(score>=alpha*psam/length(snp))%>%pull(snp)
+  } 
   
   re <- list(IV=selectsnp,score=dfscore)
   return(re)
