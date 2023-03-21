@@ -42,7 +42,7 @@
 #' df$y <- 0.5*df$x+rnorm(n,0,1)
 #' model <- bnmr(df,snpname,"x","y")
 #'
-bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,selectNum=50,nsam=1000,psam=100,sample_replace=TRUE,mr_model="linear",prior="horseshoe",init="median",n.iter=5000,n.chain=4){
+bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,selectNum=NA,alpha=0.9,nsam=1000,psam=100,sample_replace=TRUE,mr_model="linear",prior="horseshoe",init="median",n.iter=5000,n.chain=4){
   library(bnlearn)
   library(plyr)
   library(dplyr)
@@ -683,7 +683,12 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
 
   dfscore <- getscore(dfre,exposureName,snp,repeats)
   dfscore <- arrange(dfscore,desc(score))
-  selectsnp <- dfscore[1:selectNum,"snp"]
+    
+  if(!is.na(selectNum){
+    selectsnp <- dfscore[1:selectNum,"snp"]
+  }else{
+    selectsnp <- dfscore%>%filter(score>=alpha*psam/length(snp))%>%pull(snp)
+  } 
 
   exposure <- df[,exposureName]
   outcome <- df[,outcomeName]
