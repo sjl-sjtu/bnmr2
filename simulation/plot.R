@@ -622,7 +622,45 @@ ggsave("sens3.png", width=3.5, height=3, dpi = 300)
 ggplot(df)+geom_point(aes(IVnum,R))+
   geom_line(aes(IVnum,R,group=1))
 
+
+#############
 library(pROC)
+setwd("ukbsimulate2")
+df1 <- read_csv("x_score_n2000_2.csv")
+df2 <- read_csv("x_score_n5000_2.csv")
+df3 <- read_csv("x_score_n10000_2.csv")
+df4 <- read_csv("x_score_n50000_2.csv")
+roc_object1 <- roc(df1$label,df1$score)
+roc_object2 <- roc(df2$label,df2$score)
+roc_object3 <- roc(df3$label,df3$score)
+roc_object4 <- roc(df4$label,df4$score)
+
+roc_data <- rbind(
+  data.frame(spe = roc_object1$specificities, sen = roc_object1$sensitivities, dataset = "n = 2000", stringsAsFactors = FALSE),
+  data.frame(spe = roc_object2$specificities, sen = roc_object2$sensitivities, dataset = "n = 5000", stringsAsFactors = FALSE),
+  data.frame(spe = roc_object3$specificities, sen = roc_object3$sensitivities, dataset = "n = 10000", stringsAsFactors = FALSE),
+  data.frame(spe = roc_object4$specificities, sen = roc_object4$sensitivities, dataset = "n = 50000", stringsAsFactors = FALSE)
+)
+
+# Plot ROC curves with annotations
+library(ggsci)
+ggplot(roc_data, aes(x = 1-spe, y = sen, color = dataset)) +
+  geom_line() +
+  scale_color_aaas()+
+  theme_classic() +
+  # scale_color_manual(values = c("red", "blue", "green", "orange")) +
+  labs(x = "1-Specificity", y = "Sensitivity") +
+  annotate("text", x = 0.7, y = 0.3, label = paste0("n = 2000, AUC = ", sprintf("%0.2f",auc(roc_object1)))) +
+  annotate("text", x = 0.7, y = 0.25, label = paste0("n = 5000, AUC = ", sprintf("%0.2f",auc(roc_object2)))) +
+  annotate("text", x = 0.7, y = 0.2, label = paste0("n = 10000, AUC = ", sprintf("%0.2f",auc(roc_object3)))) +
+  annotate("text", x = 0.7, y = 0.15, label = paste0("n = 50000, AUC = ", sprintf("%0.2f",auc(roc_object4))))+
+  geom_segment(aes(x=0,xend=1,y=0,yend=1),color="grey",linetype=4)
+ggsave("g_n.png", width=5.5, height=5, dpi = 300)
+
+
+########
+setwd("ukbsimulate")
+
 df1 <- read_csv("x_score_p10000_3.csv")
 df2 <- read_csv("x_score_p20000_3.csv")
 df3 <- read_csv("x_score_p50000_3.csv")
@@ -653,9 +691,9 @@ ggplot(roc_data, aes(x = 1-spe, y = sen, color = dataset)) +
   theme_classic() +
   # scale_color_manual(values = c("red", "blue", "green", "orange")) +
   labs(x = "1-Specificity", y = "Sensitivity") +
-  annotate("text", x = 0.7, y = 0.3, label = paste0("p = 10000, AUC = ", sprintf("%0.3f",auc(roc_object1)))) +
-  annotate("text", x = 0.7, y = 0.25, label = paste0("p = 20000, AUC = ", sprintf("%0.3f",auc(roc_object2)))) +
-  annotate("text", x = 0.7, y = 0.2, label = paste0("p = 50000, AUC = ", sprintf("%0.3f",auc(roc_object3)))) +
-  annotate("text", x = 0.7, y = 0.15, label = paste0("p = 100000, AUC = ", sprintf("%0.3f",auc(roc_object4))))+
+  annotate("text", x = 0.7, y = 0.3, label = paste0("p = 10000, AUC = ", sprintf("%0.2f",auc(roc_object1)))) +
+  annotate("text", x = 0.7, y = 0.25, label = paste0("p = 20000, AUC = ", sprintf("%0.2f",auc(roc_object2)))) +
+  annotate("text", x = 0.7, y = 0.2, label = paste0("p = 50000, AUC = ", sprintf("%0.2f",auc(roc_object3)))) +
+  annotate("text", x = 0.7, y = 0.15, label = paste0("p = 100000, AUC = ", sprintf("%0.2f",auc(roc_object4))))+
   geom_segment(aes(x=0,xend=1,y=0,yend=1),color="grey",linetype=4)
 ggsave("g_p.png", width=5.5, height=5, dpi = 300)
