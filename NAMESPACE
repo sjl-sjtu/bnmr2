@@ -3,3 +3,4 @@
 export(bn)
 export(bnmr)
 export(mr)
+export(mr_split)

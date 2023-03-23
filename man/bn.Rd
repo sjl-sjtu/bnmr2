@@ -2,7 +2,7 @@
 % Please edit documentation in R/bn.R
 \name{bn}
 \alias{bn}
-\title{Title Getting suitable genetic IVs through random graph forest, which is based on Bayesian network structure learning}
+\title{Getting suitable genetic IVs through random graph forest, which is based on Bayesian network structure learning}
 \usage{
 bn(
   df,
@@ -10,7 +10,8 @@ bn(
   exposureName,
   bn_method = "hc",
   repeats = 1000,
-  selectNum = 50,
+  selectNum = NA,
+  alpha = 0.9,
   nsam = 1000,
   psam = 100,
   sample_replace = TRUE
@@ -27,7 +28,9 @@ bn(
 
 \item{repeats}{an integer standing for the number of subsamples or bootstraps. Default is 1000.}
 
-\item{selectNum}{the number of instrument to select. Default is 50.}
+\item{selectNum}{the number of instrument to select. Default is NA.}
+
+\item{alpha}{we will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.9.}
 
 \item{nsam}{the size of individuals in each subsample of random graph forest. Default is 1000.}
 
@@ -41,7 +44,7 @@ a list containing:
   \item{dfscore}{a data frame containing the score calculated for each SNP.}
 }
 \description{
-Title Getting suitable genetic IVs through random graph forest, which is based on Bayesian network structure learning
+Getting suitable genetic IVs through random graph forest, which is based on Bayesian network structure learning
 }
 \examples{
 n <- 2000

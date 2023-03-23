@@ -1,4 +1,4 @@
-#' Title Causal estimation by Bayesian Mendelian randomization with shrinkage prior to cope with pleiotropy
+#' Causal estimation by Bayesian Mendelian randomization with shrinkage prior to cope with pleiotropy
 #'
 #'
 #' @param df a data frame which contains data of IVs, specified exposure and outcome.
@@ -12,7 +12,7 @@
 #' @param n.chain the number of chains in MCMC sampling. Default is 4.
 #'
 #' @return a list containing:
-#'   \item{betaList}{a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.}
+#'   \item{betaList}{a vector cantaining the posterior of the causal parameter of interest using MCMC sampling.}
 #'   \item{mean}{the mean estimate of the causal parameter.}
 #'   \item{se}{the standard error of the estimation.}
 #'   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}

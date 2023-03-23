@@ -52,7 +52,7 @@ getSimulate <- function(n,p,m,pt){
     library(tidyverse)
     freq <- runif(p,0.05,0.95)
     g <- sapply(freq,function(pi) sample(c(0,1,2),n,prob = c(pi^2,2*pi*(1-pi),(1-pi)^2),replace = TRUE))
-    g2 <- map(seq(1,p),simLD,g,freq,m) 
+    g2 <- map(seq(1,p),simLD,g,freq,m)
     g2 <- do.call(cbind,g2)
     df <- cbind(g,g2)
     df <- df[,sample(ncol(df))]
@@ -65,13 +65,13 @@ getSimulate <- function(n,p,m,pt){
     alpha_0 <- 2.0
     sigma_x <- 0.25
     df$x <- alpha_0+as.matrix(df[,truesnp])%*%alpha+rnorm(n,0,sigma_x)
-    
+
     return(list(df=df,truesnp=colnames(df)[truesnp]))
 }
 
 # nlist <- c(100,500,1000)
 # plist <- c(100,200,500,1000)
-# 
+#
 # re <- tibble(n=rep(nlist,each=length(plist)),p=rep(plist,times=length(nlist)),t=NA)
 
 # for(n in c(100,500,1000,2000)){
@@ -455,3 +455,52 @@ sprintf("finish: mt=%s, ns=%d, ps=%d, r=%d, t=%.2f, recall=%.2f, recall-1=%.2f, 
 re3 %>% write_csv("compareMethods_1.csv")
 
 # write_csv(re,"timeCompare.csv")
+
+
+##################
+ns <- 2000
+ps <- 120
+timestart <- Sys.time()
+dfre <- bn(df,snp,"x",bn_method="hc",selectNum=pt,repeats=1000,nsam=ns,psam=ps)
+timeend <- Sys.time()
+t <- difftime(timeend,timestart,units="min")
+dfs <- dfre$score %>% mutate(label=ifelse(snp%in%truesnp,1,0))
+roc_object <- roc(dfs$label,dfs$score)
+recal <- (dfs%>%arrange(desc(score))%>%slice_head(n=pt)%>%pull(label)%>%sum())/pt
+recal1 <- (dfs%>%arrange(desc(score))%>%slice_head(n=round(pt/2))%>%pull(label)%>%sum())/round(pt/2)
+AUC <- auc(roc_object)
+#re[which(re$n==n&re$p==p),"t"] <- t
+re <- re%>%add_row(ns=ns,ps=ps,t=as.numeric(t),recall=recal,recall1=recal1,auc=as.numeric(AUC))
+sprintf("finish: ns=%d, ps=%d, t=%.2f, recall=%.2f, recall-1=%.2f, auc=%.2f",ns,ps,t,recal,recal1,AUC)
+
+library(tidyverse)
+library(stringr)
+library(latex2exp)
+library(ggthemes)
+library(purrr)
+library(ggsci)
+library(RColorBrewer)
+ggroc(roc_object,legacy.axes = T)+theme_few()+
+  geom_segment(aes(x=0,xend=1,y=0,yend=1),color="grey",linetype=4)+
+  annotate("text",x=0.75,y=0.25,label=paste("AUC = ",sprintf("%0.3f",roc_object$auc)))
+ggsave("pp1.png", width=5.5, height=5, dpi = 300)
+
+px <- p*(m+1)
+alpha <- seq(1.2,0.5,-0.05)
+tdr <- map_dbl(alpha,function(x) (dfs%>%filter(score>=x*ps/px)%>%pull(label)%>%sum())/nrow((dfs%>%filter(score>=x*ps/px))))
+ivn <- map_dbl(alpha,function(x) nrow((dfs%>%filter(score>=x*ps/px))))
+re <- tibble(alpha=alpha,tdr=tdr,ivn=ivn) %>% mutate_at(vars(alpha),as.factor)
+ggplot(re)+geom_point(aes(alpha,tdr,shape="TDR"))+
+  geom_line(aes(alpha,tdr,group=1,linetype="TDR"))+
+  geom_point(aes(x=alpha,y=ivn/120,shape="variant number"))+
+  geom_line(aes(x=alpha,y=ivn/120,group=1,linetype="variant number"))+
+  coord_cartesian(ylim = c(0,1))+
+  xlab(TeX("$\\alpha^*$"))+
+  ylab("TDR")+
+  theme_few()+
+  theme(plot.title = element_text(hjust = 0.5),legend.position = c(0.2, 0.2),legend.title = element_blank(),legend.text = element_text(size=10))+
+  scale_y_continuous(breaks = seq(0,1,0.2),sec.axis = sec_axis(~.*120,name = "variant number"))+
+  scale_shape_manual(name="Item",values=c(19,8))+
+  scale_linetype_manual(name="Item",values=c("solid","dashed"))
+#geom_col(aes(x=alpha,y=ivn/180),width=0.6,color="black",fill=brewer.pal(9,"BuGn")[2],position = position_dodge(preserve = "total"))
+ggsave("pp2.png", width=5.5, height=5, dpi = 300)

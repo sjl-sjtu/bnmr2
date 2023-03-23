@@ -2,7 +2,7 @@
 % Please edit documentation in R/bnmr.R
 \name{bnmr}
 \alias{bnmr}
-\title{Title Causal inference between traits using the Bayesian Network-based Mendelian randomization}
+\title{Causal inference between traits using the Bayesian Network-based Mendelian randomization}
 \usage{
 bnmr(
   df,
@@ -11,7 +11,8 @@ bnmr(
   outcomeName,
   bn_method = "hc",
   repeats = 1000,
-  selectNum = 50,
+  selectNum = NA,
+  alpha = 0.9,
   nsam = 1000,
   psam = 100,
   sample_replace = TRUE,
@@ -35,7 +36,9 @@ bnmr(
 
 \item{repeats}{an integer standing for the number of subsamples or bootstraps. Default is 1000.}
 
-\item{selectNum}{the number of instrument to select. Default is 50.}
+\item{selectNum}{the number of instrument to select. Default is NA.}
+
+\item{alpha}{we will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.9.}
 
 \item{nsam}{the size of individuals in each subsample of random graph forest. Default is 1000.}
 
@@ -57,7 +60,7 @@ bnmr(
 a list containing:
   \item{selectsnp}{a vector of string containing the colnames of df corresponding to selected SNPs.}
   \item{dfscore}{a data frame containing the score calculated for each SNP.}
-  \item{betaList}{a vector cantaining the result of MCMC sampling of the causal parameter we want to estimate.}
+  \item{betaList}{a vector cantaining the posterior of the causal parameter of interest using MCMC sampling.}
   \item{mean}{the mean estimate of the causal parameter.}
   \item{se}{the standard error of the estimation.}
   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
@@ -66,7 +69,7 @@ a list containing:
   \item{fit_detail}{an S4 class stanfit object containing the details of Bayesian MR estimation}
 }
 \description{
-Title Causal inference between traits using the Bayesian Network-based Mendelian randomization
+Causal inference between traits using the Bayesian Network-based Mendelian randomization
 }
 \examples{
 n <- 2000
