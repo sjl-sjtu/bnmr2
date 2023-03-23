@@ -9,7 +9,7 @@ library(devtools)
 devtools::install_github("sjl-sjtu/bnmr")
 ```
 
-Usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.0.pdf.
+Usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.1.pdf.
 
 Latest updation at Mar. 23rd, 2023.
 
