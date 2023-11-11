@@ -15,6 +15,6 @@ For large-scale dataset (like biobank), we recommend to conduct Bayesian MR anal
 
 Supplementary notes, tables, and figures for the paper can be found at https://github.com/sjl-sjtu/bnmr/blob/main/supplementary_notes.pdf.
 
-Latest updation at Oct. 18th, 2023.
+Latest updation at Nov. 11th, 2023.
 
 Contact me: Jianle Sun (sjl-2017@sjtu.edu.cn)
