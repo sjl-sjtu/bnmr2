@@ -360,8 +360,6 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
         real deltax;
         real deltay;
         real beta;
-        real<lower=0> c;
-        real<lower=0,upper=1> pi;
         vector[N] u;
         vector[J] z;
         vector[J] alpha;
@@ -409,8 +407,6 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
         real deltax;
         real deltay;
         real beta;
-        real<lower=0> c;
-        real<lower=0,upper=1> pi;
         vector[N] u;
         vector[J] z;
         vector[J] alpha;
@@ -605,8 +601,6 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
       real deltax;
       real deltay;
       real beta;
-      real<lower=0> c;
-      real<lower=0,upper=1> pi;
       vector[N] u;
       vector[J] z;
       vector[J] alpha;
@@ -653,8 +647,6 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
       real deltax;
       real deltay;
       real beta;
-      real<lower=0> c;
-      real<lower=0,upper=1> pi;
       vector[N] u;
       vector[J] z;
       vector[J] alpha;
