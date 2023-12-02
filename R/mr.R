@@ -231,8 +231,6 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
         real deltax;
         real deltay;
         real beta;
-        real<lower=0> c;
-        real<lower=0,upper=1> pi;
         vector[N] u;
         vector[J] z;
         vector[J] alpha;
@@ -280,8 +278,6 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
         real deltax;
         real deltay;
         real beta;
-        real<lower=0> c;
-        real<lower=0,upper=1> pi;
         vector[N] u;
         vector[J] z;
         vector[J] alpha;
@@ -476,8 +472,6 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       real deltax;
       real deltay;
       real beta;
-      real<lower=0> c;
-      real<lower=0,upper=1> pi;
       vector[N] u;
       vector[J] z;
       vector[J] alpha;
@@ -524,8 +518,6 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       real deltax;
       real deltay;
       real beta;
-      real<lower=0> c;
-      real<lower=0,upper=1> pi;
       vector[N] u;
       vector[J] z;
       vector[J] alpha;
