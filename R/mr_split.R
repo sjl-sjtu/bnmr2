@@ -217,8 +217,6 @@ mr_split <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",pri
         real deltax;
         real deltay;
         real beta;
-        real<lower=0> c;
-        real<lower=0,upper=1> pi;
         vector[N] u;
         vector[J] z;
         vector[J] alpha;
@@ -266,8 +264,6 @@ mr_split <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",pri
         real deltax;
         real deltay;
         real beta;
-        real<lower=0> c;
-        real<lower=0,upper=1> pi;
         vector[N] u;
         vector[J] z;
         vector[J] alpha;
@@ -462,8 +458,6 @@ mr_split <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",pri
       real deltax;
       real deltay;
       real beta;
-      real<lower=0> c;
-      real<lower=0,upper=1> pi;
       vector[N] u;
       vector[J] z;
       vector[J] alpha;
@@ -510,8 +504,6 @@ mr_split <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",pri
       real deltax;
       real deltay;
       real beta;
-      real<lower=0> c;
-      real<lower=0,upper=1> pi;
       vector[N] u;
       vector[J] z;
       vector[J] alpha;
