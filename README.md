@@ -3,15 +3,27 @@ This is an R package to conduct causal estimation between exposure and outcome o
 
 ![image](https://github.com/sjl-sjtu/bnmr/blob/main/FIG/Fig1.jpg)
 
+## Tutorial
+### 1. Installation
 You can install the package as the following:
 ```R
 library(devtools)
 devtools::install_github("sjl-sjtu/bnmr")
 ```
+### 2. Beginners' Guide
+Here we provide a illustrational step-by-step example with a simulated dataset to demonstrate the usage of bnmr.
 
+TBD
+
+### 3. Hyperparameters
+TBD
+
+### 4. API Usage
 Usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.1.pdf.
 
+### 5. Adaptation to large-scale biobank-level data
 For large-scale dataset (like biobank), we recommend to conduct Bayesian MR analysis using Python Package PyMC with NUTS JAX samplers (NumPyro or BlackJAX) and GPU (https://www.pymc-labs.com/blog-posts/pymc-stan-benchmark/) to achieve faster posterior sampling. A tutorial of PyMC (v5) with JAX and Numba can be found at https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html. An example in BNMR can be found at https://github.com/sjl-sjtu/bnmr/blob/main/BayesianMR_example_pymc.py.
+
 
 Supplementary notes, tables, and figures for the paper can be found at https://github.com/sjl-sjtu/bnmr/blob/main/supplementary_notes.pdf.
 
