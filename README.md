@@ -52,7 +52,8 @@ The Bayesian estimation is implemented based on `RStan`. The object `mr_results`
 
 The above two steps can be integrated via function `bnmr`.
 ```R
-model <- bnmr(df,snpname,"x","y",bn_method="hc",repeats=1000,alpha=0.9,nsam=2000,psam=100,mr_model="linear",prior="horseshoe",n.iter=5000,n.chain=4)
+model <- bnmr(df,snpname,"x","y",bn_method="hc",repeats=1000,alpha=0.9,nsam=2000,psam=100,
+              mr_model="linear",prior="horseshoe",n.iter=5000,n.chain=4)
 ```
 
 ### 3. Hyperparameters
