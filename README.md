@@ -18,7 +18,7 @@ Let's start with a small simulated dataset.
 ```R
 n <- 2000
 p <- 200
-snps <- replicate(p,sample(1:3,n,replace = TRUE))
+snps <- replicate(p,sample(0:2,n,replace = TRUE))
 snps <- apply(snps,2,as.numeric)
 snpname <- paste0("g",1:p)
 df <- as.data.frame(snps)
