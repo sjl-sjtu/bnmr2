@@ -4,7 +4,6 @@ This is an R package to conduct causal estimation between exposure and outcome o
 ![image](https://github.com/sjl-sjtu/bnmr/blob/main/FIG/Fig1.jpg)
 
 ## Tutorial
-[toc]
 ### 1. Installation
 You can install the package as the following:
 ```R
