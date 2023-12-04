@@ -88,7 +88,7 @@ Here we use `n.split=4` to represent that the entire dataset is divided into 4 s
 #### 2) Using PyMC with NUTS JAX samplers (Recommended)
 We recommend to conduct Bayesian MR analysis within large-scale biobank using Python Package PyMC with NUTS JAX samplers (NumPyro or BlackJAX) and GPU (https://www.pymc-labs.com/blog-posts/pymc-stan-benchmark/) to achieve faster posterior sampling. A tutorial of PyMC (v5) with JAX and Numba can be found at https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html. An example in BNMR can be found at https://github.com/sjl-sjtu/bnmr/blob/main/BayesianMR_example_pymc.py.
 
-### * An integrated example using bnmr PyMC to handle large scale data from UK Biobank
+### * An integrated example using bnmr and PyMC to handle large scale data from UK Biobank
 The tutorial for the integrated example is shown at https://github.com/sjl-sjtu/bnmr/blob/main/integrated_example.md.
 
 ## Reference
