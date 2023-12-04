@@ -28,8 +28,8 @@ import aesara.tensor as at
 import aesara
 import numpyro
 
-df = pd.read_csv("lym_bind.csv") # data frame of SNPs, exposures and outcomes
-df1 = pd.read_csv("lym_score.csv") # adjacency score from RGF (BN)
+df = pd.read_csv("RBC_bind.csv") # data frame of SNPs, exposures and outcomes
+df1 = pd.read_csv("RBC_score.csv") # adjacency score from RGF (BN)
 df1 = df1.sort_values(by='score', ascending=False)
 IV = df1['snp'].head(20).tolist()
 feature = ['RBC','DBP']
