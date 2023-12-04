@@ -13,18 +13,16 @@ os.environ["XLA_FLAGS"] = "--xla_force_host_platform_device_count={}".format(
 )
 ```
 
-If you want to work on GPU, specify the number of cudas. Here we show an example of using 2 cudas by specifying `os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"`.
+If you want to work on GPU, specify the number of cudas. For example, we can use 2 cudas in computation by specifying `os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"`.
 ```python
 # if you use gpu
 os.environ["THEANO_FLAGS"] = "device=cuda"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 ```
 
 Import neccessary libraries now:
 ```python
 import jax
-print(jax.default_backend())
-print(jax.devices())
 import torch
 import numpy as np
 import arviz as az
