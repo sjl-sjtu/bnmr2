@@ -76,7 +76,16 @@ The main hyperparameters of the inference phase include the shrinkage prior `pri
 Detail usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.1.pdf.
 
 ### 5. Adaptation to large-scale biobank-level data
-For large-scale dataset (like biobank), we recommend to conduct Bayesian MR analysis using Python Package PyMC with NUTS JAX samplers (NumPyro or BlackJAX) and GPU (https://www.pymc-labs.com/blog-posts/pymc-stan-benchmark/) to achieve faster posterior sampling. A tutorial of PyMC (v5) with JAX and Numba can be found at https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html. An example in BNMR can be found at https://github.com/sjl-sjtu/bnmr/blob/main/BayesianMR_example_pymc.py.
+For Bayesian posterior sampling within large-scale dataset (like biobank), we provide two options:
+#### 1) Consolidation of subset posterior sampling
+Split the whole dataset into samll subsets and conduct MCMC sampling parallelly and combine the posterior. This can be achieved with function `mr_split` in package `bnmr`.
+```R
+mr_results <- mr_split(df,truesnp,"x","y",mr_model="linear",prior="horseshoe",n.iter=5000,n.chain=4,n.split=4)
+```
+Here we use `n.split=4` to represent that the entire dataset is divided into 4 subsets, sampled separately by MCMC, and then merged with the posterior distribution.
+
+#### 2) Using PyMC with NUTS JAX samplers (Recommended)
+We recommend to conduct Bayesian MR analysis within large-scale biobank using Python Package PyMC with NUTS JAX samplers (NumPyro or BlackJAX) and GPU (https://www.pymc-labs.com/blog-posts/pymc-stan-benchmark/) to achieve faster posterior sampling. A tutorial of PyMC (v5) with JAX and Numba can be found at https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html. An example in BNMR can be found at https://github.com/sjl-sjtu/bnmr/blob/main/BayesianMR_example_pymc.py.
 
 
 Supplementary notes, tables, and figures for the paper can be found at https://github.com/sjl-sjtu/bnmr/blob/main/supplementary_notes.pdf.
