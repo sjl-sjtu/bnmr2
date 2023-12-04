@@ -1,7 +1,7 @@
 # An integrated exemple of BNMR 
 
 ### 1. Data Preparation
-Firstly, according to the GWAS summary statistics and the set primary screening criteria, we can prepare a file of sample ID and corresponding phenotypes, and another with list of pre-filtered candidate SNPs. Genomic analysis tools like PLINK (https://www.cog-genomics.org/plink/2.0/) can then be used to extract the data of the pre-screened samples and SNPs. Then, we use the R-package bnmr for ensemble Bayesian network structure learning to select tool variables.
+Firstly, according to the GWAS summary statistics and the set primary screening criteria, we can prepare a file of sample ID and corresponding phenotypes, and another with list of pre-filtered candidate SNPs. Genomic analysis tools like PLINK 2.0 (<https://www.cog-genomics.org/plink/2.0/>) can then be used to extract the data of the pre-screened samples and SNPs. Then, we use the R-package bnmr for ensemble Bayesian network structure learning to select tool variables.
 
 With files converted by PLINK, we need to organize them to prepare for BN learning.
 ```R
@@ -33,7 +33,7 @@ dfs %>% write_csv("RBC_score.csv")
 ```
 
 ### 3. Inference Stage
-Since this dataset includes more than 200,000 individuals, we used Python library PyMC (https://www.pymc.io/welcome.html) and NUTS JAX samplers to estimate the inference stage. First let me set the environment
+Since this dataset includes more than 200,000 individuals, we used Python library PyMC (<https://www.pymc.io/welcome.html>) and NUTS JAX samplers to estimate the inference stage. First let me set the environment
 ```python
 import os
 import multiprocessing
@@ -121,7 +121,7 @@ with pm.Model() as shrink_model:
     # Y = pm.Bernoulli('Y', p=pm.invlogit(omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay), observed=Y)  # for binary outcome
 ```
 
-Then sample the posterior distribution using MCMC. Different samplers can be used, like NumPyro JAX NUTS sampler (by specifying `nuts_sampler="numpyro"`, BlackJAX NUTS sampler (by specifying `nuts_sampler="blackjax"`), and Nutpie Rust NUTS sampler (by specifying `nuts_sampler="nutpie"`). We recommend to use NumPyro JAX NUTS sampler here.
+Then sample the posterior distribution using MCMC. Different samplers can be used, like NumPyro JAX NUTS sampler (by specifying `nuts_sampler="numpyro"`, BlackJAX NUTS sampler (by specifying `nuts_sampler="blackjax"`), and Nutpie Rust NUTS sampler (by specifying `nuts_sampler="nutpie"`). We recommend to use NumPyro JAX NUTS sampler here. To know more about NUTS samplers, please see <https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html>.
 ```python
 with shrink_model:    
     trace = pm.sample(draws=5000, tune=5000, chains=4, cores=4, target_accept=0.9,nuts_sampler="numpyro")
