@@ -1,4 +1,4 @@
-# An intergrated exemple of BNMR 
+# An integrated exemple of BNMR 
 
 ### 1. Data Preparation
 Firstly, according to the GWAS summary statistics and the set primary screening criteria, we can prepare a file of sample ID and corresponding phenotypes, and another with list of pre-filtered candidate SNPs. Genomic analysis tools like PLINK (https://www.cog-genomics.org/plink/2.0/) can then be used to extract the data of the pre-screened samples and SNPs. Then, we use the R-package bnmr for ensemble Bayesian network structure learning to select tool variables.
