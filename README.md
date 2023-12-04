@@ -11,7 +11,7 @@ library(devtools)
 devtools::install_github("sjl-sjtu/bnmr")
 ```
 ### 2. Beginners' Guide
-Here we provide a illustrational step-by-step example with a simulated dataset to demonstrate the usage of bnmr.
+Here we provide a illustrational step-by-step example with a simulated dataset to demonstrate the usage of `bnmr`.
 
 #### 1) Contructing simulated dataset
 Let's start with a small simulated dataset.
