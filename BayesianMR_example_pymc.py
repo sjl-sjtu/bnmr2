@@ -9,12 +9,12 @@
 import os
 import multiprocessing
 
-# if use cpu
+# if you use cpu
 os.environ["XLA_FLAGS"] = "--xla_force_host_platform_device_count={}".format(
     multiprocessing.cpu_count()
 )
 
-# if use gpu
+# if you use gpu
 # os.environ["THEANO_FLAGS"] = "device=cuda"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 
@@ -35,9 +35,7 @@ np.set_printoptions(2)
 import pymc as pm
 import aesara.tensor as at 
 import aesara
-
 import numpyro
-numpyro.set_host_device_count(4)
 
 df = pd.read_csv("lym_bind.csv") # data frame of SNPs, exposures and outcomes
 df1 = pd.read_csv("lym_score.csv") # adjacency score from RGF (BN)
