@@ -1,4 +1,4 @@
-# An intergrate exemple of BNMR 
+# An intergrated exemple of BNMR 
 
 ### 1. Data Preparation
 Firstly, according to the GWAS summary statistics and the set primary screening criteria, we can prepare a file of sample ID and corresponding phenotypes, and another with list of pre-filtered candidate SNPs. Genomic analysis tools like PLINK (https://www.cog-genomics.org/plink/2.0/) can then be used to extract the data of the pre-screened samples and SNPs. Then, we use the R-package bnmr for ensemble Bayesian network structure learning to select tool variables.
@@ -97,7 +97,7 @@ Z = df[s].values.reshape((N, J))
 
 Define model and priors (here we show the example of horseshoe prior)
 ```python
-# Define the PyMC3 model
+# Define the PyMC model
 with pm.Model() as shrink_model:
     # Priors
     sigmax = pm.HalfFlat('sigmax') 
@@ -125,7 +125,14 @@ Then sample the posterior distribution using MCMC. Different samplers can be use
 ```python
 with shrink_model:    
     trace = pm.sample(draws=5000, tune=5000, chains=4, cores=4, target_accept=0.9,nuts_sampler="numpyro")
-    # Get the samples
+    # Get the samples of beta
     subdata = trace.posterior['beta']
     print(az.summary(subdata))
+```
+
+We store the posterior samples of causal effect parameter $beta$.
+```python
+import pickle
+with open('RBC_DBP_beta.pkl', 'wb') as f:
+    pickle.dump(subdata, f)
 ```
