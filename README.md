@@ -32,7 +32,9 @@ library(bnmr)
 rgf_results <- bn(df,snpname,"x")
 ```
 
-The object `rgf_results` is a list containing two objects. The first object, `selectsnp`, is the names of genetic instrumental variables (IVs) selected based on predefined parameters, and the second object, `dfscore`, is the complete RGF result, which is a data frame containing two columns - the first column is the name of the SNP, and the second column is the corresponding adjacency score, arranged in descending order of adjacency scores.
+The object `rgf_results` is a list containing two objects. The first object, `selectsnp`, is the names of genetic instrumental variables (IVs) selected based on predefined parameters, and the second object, `dfscore`, is the complete RGF result, which is a data frame containing two columns - the first column is the name of the SNP, and the second column is the corresponding adjacency score, arranged in descending order of adjacency scores. 
+
+We provide two criteria for selecting IVs from adjacency scores, the first is to specify the number of IVs directly, which can be achieved by specifying the `selectNum` parameter in the `bn` function; The second is to set a threshold $\alpha$ between 0-1, at which point SNPs with a critical score greater than `alpha*psam/p` (`p` is the total number of SNPs assessed by RGF and `psam` is the number of SNPs selected per sampling) will be selected as IVs, which can be achieved by specifying parameter `alpha` in the `bn` function. Note that the parameter `alpha` will not work when the parameter `selectNum` is specified. The default `alpha` of the program is 0.9. Of course, you can also use the data frame containing full adjacency score of the output to define your own criteria to select IVs.
 
 ### 3. Hyperparameters
 TBD
