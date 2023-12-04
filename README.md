@@ -62,7 +62,7 @@ There are some hyperparameters in RGF that can be specified, including the numbe
 * `nsam`: For small samples (<5000), it is recommended to set nsam to the same as the total sample size and set `sample_replace=TRUE`, which is bootstrapping. For larger samples, nsam recommends setting between 2000-5000, `sample_replace` can be set to `TRUE` or `FALSE`, corresponding to sampling from all samples with and without return, respectively.
 * `psam`: We recommend setting the number of variants to be selected between 100 and 150 per sampling. An increase in the number of variants significantly increases the calculation time.
 * `repeats`: To ensure adequate sampling, we recommend that both `repeats*nsam/n` and `repeats*psam/p` should be above 100. Here n and p are the total number of samples and the number of loci, respectively.
-* `bn_method`: We implement BN learning with algorithms provided by R package `bnlearn` (https://www.bnlearn.com/), including contraint-based, score-based, and hybrid approaches. In our simulations, fast.iamb performs best in terms of false discovery rate (FDR) control, while the Hill-Climbing (hc) algorithm is the fastest. Although other methods may be more precise, hc is able to meet the requirements under mundane situations.
+* `bn_method`: We implement BN learning with algorithms provided by R package `bnlearn` (<https://www.bnlearn.com/>), including contraint-based, score-based, and hybrid approaches. In our simulations, fast.iamb performs best in terms of false discovery rate (FDR) control, while the Hill-Climbing (hc) algorithm is the fastest. Although other methods may be more precise, hc is able to meet the requirements under mundane situations.
 
 #### 2) Inference stage:
 The main hyperparameters of the inference phase include the shrinkage prior `prior`, number of IVs, and number of iterations `n.iter`.
@@ -71,7 +71,7 @@ The main hyperparameters of the inference phase include the shrinkage prior `pri
 * Numbers of iterations `n.iter` and chains `n.chain`: We endorse the use of at least 4 chains and at least 2000 iterations per chain in MCMC.
 
 ### 4. API
-Detail usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.1.pdf.
+Detail usage and examples can be found at <https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.1.pdf>.
 
 ### 5. Adaptation to large-scale biobank-level data
 For Bayesian posterior sampling within large-scale dataset (like biobank), we provide two options:
@@ -84,13 +84,13 @@ mr_results <- mr_split(df,truesnp,"x","y",mr_model="linear",prior="horseshoe",
 Here we use `n.split=4` to represent that the entire dataset is divided into 4 subsets, sampled separately by MCMC, and then merged the posterior sampling within each subset.
 
 #### 2) Using PyMC with NUTS JAX samplers (Recommended)
-We recommend to conduct Bayesian MR analysis within large-scale biobank using Python Package PyMC with NUTS JAX samplers (NumPyro or BlackJAX) and GPU (https://www.pymc-labs.com/blog-posts/pymc-stan-benchmark/) to achieve faster posterior sampling. A tutorial of PyMC (v5) with JAX and Numba can be found at https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html. An example in BNMR can be found at https://github.com/sjl-sjtu/bnmr/blob/main/BayesianMR_example_pymc.py.
+We recommend to conduct Bayesian MR analysis within large-scale biobank using Python Package PyMC with NUTS JAX samplers (NumPyro or BlackJAX) and GPU (<https://www.pymc-labs.com/blog-posts/pymc-stan-benchmark/>) to achieve faster posterior sampling. A tutorial of PyMC (v5) with JAX and Numba can be found at <https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html>. An example in BNMR can be found at https://github.com/sjl-sjtu/bnmr/blob/main/BayesianMR_example_pymc.py.
 
 ### * An integrated example using bnmr and PyMC to handle large scale data from UK Biobank
-The tutorial for the integrated example is shown at https://github.com/sjl-sjtu/bnmr/blob/main/integrated_example.md.
+The tutorial for the integrated example is shown at <https://github.com/sjl-sjtu/bnmr/blob/main/integrated_example.md>.
 
 ## Reference
-Supplementary notes, tables, and figures for the paper can be found at https://github.com/sjl-sjtu/bnmr/blob/main/supplementary_notes.pdf.
+Supplementary notes, tables, and figures for the paper can be found at <https://github.com/sjl-sjtu/bnmr/blob/main/supplementary_notes.pdf>.
 
 Latest updation at Nov. 11th, 2023.
 
