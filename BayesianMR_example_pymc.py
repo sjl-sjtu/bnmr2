@@ -52,7 +52,7 @@ Z = df[s].values.reshape((N, J))
 # Z = at.as_tensor_variable(Z)
 
 
-# Define the PyMC3 model (here show the example of horseshoe prior)
+# Define the PyMC model (here show the example of horseshoe prior)
 with pm.Model() as shrink_model:
     # Priors
     sigmax = pm.HalfFlat('sigmax') 
