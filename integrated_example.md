@@ -130,7 +130,7 @@ with shrink_model:
     print(az.summary(subdata))
 ```
 
-We store the posterior samples of causal effect parameter $/beta$.
+We store the posterior samples of causal effect parameter $\beta$.
 ```python
 import pickle
 with open('RBC_DBP_beta.pkl', 'wb') as f:
