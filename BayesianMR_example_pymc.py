@@ -13,7 +13,6 @@ os.environ["XLA_FLAGS"] = "--xla_force_host_platform_device_count={}".format(
 import jax
 print(jax.default_backend())
 print(jax.devices())
-import torch
 import numpy as np
 import arviz as az
 import matplotlib.pyplot as plt
@@ -77,7 +76,7 @@ with pm.Model() as shrink_model:
     # Y = pm.Bernoulli('Y', p=pm.invlogit(omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay), observed=Y)  # for binary
 
 with shrink_model:    
-    trace = pm.sample(draws=5000, tune=5000, chains=4, cores=4, target_accept=0.9,nuts_sampler="blackjax")
+    trace = pm.sample(draws=5000, tune=5000, chains=4, cores=4, target_accept=0.9,nuts_sampler="numpyro")
 
     # Get the samples
     subdata = trace.posterior['beta']
