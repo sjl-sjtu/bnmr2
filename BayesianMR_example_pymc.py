@@ -1,11 +1,3 @@
-# import jax
-# import jax.numpy as jnp
-# import pandas as pd
-# import numpy as np
-# import pymc3 as pm
-# # import theano.tensor as tt
-
-
 import os
 import multiprocessing
 
@@ -21,7 +13,6 @@ os.environ["XLA_FLAGS"] = "--xla_force_host_platform_device_count={}".format(
 import jax
 print(jax.default_backend())
 print(jax.devices())
-
 import torch
 import numpy as np
 import arviz as az
