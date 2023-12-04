@@ -1,5 +1,5 @@
 # Bayesian Network-based Mendelian Randomization (BNMR)
-This is an R package to conduct causal estimation between exposure and outcome on GWAS data using BNMR model, which is a two-staged framework to deal with the imperfect genetic instruments. It selects approaciate genetic instruments via random graph forest, which comprises a series Bayesian network structure learning among sampled variants and exposure. It then uses the Bayesian Mendelian randomization with a shrinkage prior to cope with horizontal pleiotropy and obtain a robust estimate. 
+This is an R package to conduct causal estimation between exposure and outcome on GWAS data using BNMR model, which is a two-staged framework to deal with the imperfect genetic instruments. It selects approaciate genetic instruments via random graph forest, an ensemble approach comprises a series Bayesian network structure learning within sampled variants and exposure. It then uses the Bayesian Mendelian randomization with a shrinkage prior to cope with horizontal pleiotropy and obtain a robust estimate. 
 
 ![image](https://github.com/sjl-sjtu/bnmr/blob/main/FIG/Fig1.jpg)
 
@@ -13,13 +13,32 @@ devtools::install_github("sjl-sjtu/bnmr")
 ### 2. Beginners' Guide
 Here we provide a illustrational step-by-step example with a simulated dataset to demonstrate the usage of bnmr.
 
-TBD
+Let's start with a small simulated dataset.
+```R
+n <- 2000
+p <- 200
+snps <- replicate(p,sample(1:3,n,replace = TRUE))
+snps <- apply(snps,2,as.numeric)
+snpname <- paste0("g",1:p)
+df <- as.data.frame(snps)
+colnames(df) <- snpname
+truesnp <- paste0("g",sample(1:p,50))
+df$x <- as.matrix(df[,truesnp])%*%rnorm(50,0.05,0.05)+rnorm(n,0,1)
+df$y <- 0.5*df$x+rnorm(n,0,1)
+```
+The example dataset includes 2,000 samples and 200 SNP loci, as well as two phenotypes, `x` and `y`. We now use a random graph forest (RGF) to select the loci that directly affect the exposed x. This can be done by using the `bn` function of package `bnmr`.
+```R
+library(bnmr)
+rgf_results <- bn(df,snpname,"x")
+```
+
+The object `rgf_results` is a list containing two objects. The first object, `selectsnp`, is the names of genetic instrumental variables (IVs) selected based on predefined parameters, and the second object, `dfscore`, is the complete RGF result, which is a data frame containing two columns - the first column is the name of the SNP, and the second column is the corresponding adjacency score, arranged in descending order of adjacency scores.
 
 ### 3. Hyperparameters
 TBD
 
-### 4. API Usage
-Usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.1.pdf.
+### 4. API
+Deatil usage and examples can be found at https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.1.pdf.
 
 ### 5. Adaptation to large-scale biobank-level data
 For large-scale dataset (like biobank), we recommend to conduct Bayesian MR analysis using Python Package PyMC with NUTS JAX samplers (NumPyro or BlackJAX) and GPU (https://www.pymc-labs.com/blog-posts/pymc-stan-benchmark/) to achieve faster posterior sampling. A tutorial of PyMC (v5) with JAX and Numba can be found at https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html. An example in BNMR can be found at https://github.com/sjl-sjtu/bnmr/blob/main/BayesianMR_example_pymc.py.
