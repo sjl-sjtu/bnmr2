@@ -80,7 +80,8 @@ For Bayesian posterior sampling within large-scale dataset (like biobank), we pr
 #### 1) Consolidation of subset posterior sampling
 Split the whole dataset into samll subsets and conduct MCMC sampling parallelly and combine the posterior. This can be achieved with function `mr_split` in package `bnmr`.
 ```R
-mr_results <- mr_split(df,truesnp,"x","y",mr_model="linear",prior="horseshoe",n.iter=5000,n.chain=4,n.split=4)
+mr_results <- mr_split(df,truesnp,"x","y",mr_model="linear",prior="horseshoe",
+                       n.iter=5000,n.chain=4,n.split=4)
 ```
 Here we use `n.split=4` to represent that the entire dataset is divided into 4 subsets, sampled separately by MCMC, and then merged with the posterior distribution.
 
