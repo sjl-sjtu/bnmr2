@@ -17,7 +17,7 @@
 #'   \item{se}{the standard error of the estimation.}
 #'   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
 #'   \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
-#'   \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
+#'   \item{Rhat}{an indicator to measure the convergence (at convergence, Rhat <= 1.1).}
 #'
 #' @export
 #'
