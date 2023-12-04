@@ -48,7 +48,7 @@ mr_results <- mr(df,IVs,"x","y",mr_model="linear",prior="horseshoe",n.iter=5000,
 print(mr_results$mean,mr_results$se,mr_results$lower,mr_results$upper)
 ```
 
-We implemented linear (for quantitative outcome, by specifying `mr_model="linear"`) and logistic (for binary outcome, by specifying `mr_model="logit"`) model in Mendelian randomization. Note that for hypothesis testing purposes, a linear model can also be used for dichotomous outcomes. In general, linear models are more efficiency.
+We implemented linear (for quantitative outcome, by specifying `mr_model="linear"`) and logistic (for binary outcome, by specifying `mr_model="logit"`) model in Mendelian randomization. Note that for hypothesis testing purposes, a linear model can also be used for binary outcomes like diseases. In general, linear models are more efficiency.
 
 The Bayesian estimation is implemented based on `RStan` (https://mc-stan.org/users/interfaces/rstan). The object `mr_results` is a list containing seven elements. The first element `betaList` is a vector containing posterior sampling of causal effect $\beta$. The following four elements are the posterior mean estimate, standard error, the lower and upper bound of 95% credible intervals of $\beta$. The element `Rhat` is an indicator of convergence (Rhat < 1.1 at convergence). `fit_detail` is an S4 class Stan fit object containing details of Bayesian estimation.
 
