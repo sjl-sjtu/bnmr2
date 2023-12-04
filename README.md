@@ -50,7 +50,7 @@ print(mr_results$mean,mr_results$se,mr_results$lower,mr_results$upper)
 
 We implemented linear (for quantitative outcome, by specifying `mr_model="linear"`) and logistic (for binary outcome, by specifying `mr_model="logit"`) model in Mendelian randomization. Note that for hypothesis testing purposes, a linear model can also be used for dichotomous outcomes. In general, linear models are more efficiency.
 
-The Bayesian estimation is implemented based on `RStan`. The object `mr_results` is a list containing seven elements. The first element `betaList` is a vector containing posterior sampling of causal effect $\beta$. The following four elements are the posterior mean estimate, standard error, the lower and upper bound of 95% credible intervals of $\beta$. The element `Rhat` is an indicator of convergence (Rhat < 1.1 at convergence). `fit_detail` is an S4 class Stan fit object containing details of Bayesian estimation.
+The Bayesian estimation is implemented based on `RStan` (https://mc-stan.org/users/interfaces/rstan). The object `mr_results` is a list containing seven elements. The first element `betaList` is a vector containing posterior sampling of causal effect $\beta$. The following four elements are the posterior mean estimate, standard error, the lower and upper bound of 95% credible intervals of $\beta$. The element `Rhat` is an indicator of convergence (Rhat < 1.1 at convergence). `fit_detail` is an S4 class Stan fit object containing details of Bayesian estimation.
 
 The above two steps can be integrated via function `bnmr`.
 ```R
@@ -59,6 +59,11 @@ model <- bnmr(df,snpname,"x","y",bn_method="hc",repeats=1000,alpha=0.9,nsam=2000
 ```
 
 ### 3. Hyperparameters
+#### 1) Learning stage:
+There are some hyperparameters in RGF that can be specified, including the number of samples per sampling `nsam`, the number of loci selected for each sampling `psam`, the number of sampling in ensembel learning `repeats`, and the algorithm for BN structure learning `bn_method`.
+
+#### 2) Inference stage:
+
 TBD
 
 ### 4. API
