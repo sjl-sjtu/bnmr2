@@ -60,7 +60,7 @@ model <- bnmr(df,snpname,"x","y",bn_method="hc",repeats=1000,alpha=0.9,nsam=2000
 
 ### 3. Hyperparameters
 #### 1) Learning stage:
-There are some hyperparameters in RGF that can be specified, including the number of samples per sampling `nsam`, the number of loci selected for each sampling `psam`, the number of sampling in ensembel learning `repeats`, and the algorithm for Bayesian Network (BN) structure learning `bn_method`.
+There are some hyperparameters in RGF that can be specified, including the number of samples per sampling `nsam`, the number of loci selected for each sampling `psam`, the number of sampling in ensemble learning `repeats`, and the algorithm for Bayesian Network (BN) structure learning `bn_method`.
 * `nsam`: For small samples (<5000), it is recommended to set nsam to the same as the total sample size and set `sample_replace=TRUE`, which is bootstrapping. For larger samples, nsam recommends setting between 2000-5000, `sample_replace` can be set to TRUE or FALSE, corresponding to sampling from all samples with and without return, respectively.
 * `psam`: We recommend setting the number of variants to be selected between 100 and 150 per sampling. An increase in the number of variants significantly increases the calculation time.
 * `repeats`: To ensure adequate sampling, we recommend that both `repeats*nsam/n` and `repeats*psam/p` should be above 100. Here n and p are the total number of samples and the number of loci, respectively.
