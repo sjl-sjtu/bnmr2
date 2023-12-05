@@ -38,7 +38,7 @@ bnmr(
 
 \item{selectNum}{the number of instrument to select. Default is NA.}
 
-\item{alpha}{we will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.9.}
+\item{alpha}{a number between 0 and 1 to specify the threshold for IV selection. We will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.9.}
 
 \item{nsam}{the size of individuals in each subsample of random graph forest. Default is 1000.}
 
@@ -65,7 +65,7 @@ a list containing:
   \item{se}{the standard error of the estimation.}
   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
   \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
-  \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
+  \item{Rhat}{an indicator to measure the convergence (at convergence, Rhat <= 1.1).}
   \item{fit_detail}{an S4 class stanfit object containing the details of Bayesian MR estimation}
 }
 \description{
@@ -74,7 +74,7 @@ Causal inference between traits using the Bayesian Network-based Mendelian rando
 \examples{
 n <- 2000
 p <- 200
-snps <- replicate(p,sample(1:3,n,replace = TRUE))
+snps <- replicate(p,sample(0:2,n,replace = TRUE))
 snps <- apply(snps,2,as.numeric)
 snpname <- paste0("g",1:p)
 df <- as.data.frame(snps)

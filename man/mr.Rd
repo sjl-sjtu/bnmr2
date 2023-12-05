@@ -42,7 +42,7 @@ a list containing:
   \item{se}{the standard error of the estimation.}
   \item{lower}{the lower boundary of the 95\% CI of the causal estimation.}
   \item{upper}{the upper boundary of the 95\% CI of the causal estimation.}
-  \item{Rhat}{a indicator to measure the convergence (at convergence, Rhat <= 1.1).}
+  \item{Rhat}{an indicator to measure the convergence (at convergence, Rhat <= 1.1).}
   \item{fit_detail}{an S4 class stanfit object containing the details of Bayesian MR estimation}
 }
 \description{
@@ -51,7 +51,7 @@ Causal estimation by Bayesian Mendelian randomization with shrinkage prior to co
 \examples{
 n <- 2000
 p <- 200
-snps <- replicate(p,sample(1:3,n,replace = TRUE))
+snps <- replicate(p,sample(0:2,n,replace = TRUE))
 snps <- apply(snps,2,as.numeric)
 snpname <- paste0("g",1:p)
 df <- as.data.frame(snps)
