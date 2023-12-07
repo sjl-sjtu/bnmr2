@@ -11,7 +11,7 @@ bn(
   bn_method = "hc",
   repeats = 1000,
   selectNum = NA,
-  alpha = 0.9,
+  alpha = 0.5,
   nsam = 1000,
   psam = 100,
   sample_replace = TRUE
@@ -30,7 +30,7 @@ bn(
 
 \item{selectNum}{the number of instrument to select. Default is NA.}
 
-\item{alpha}{a number between 0 and 1 to specify the threshold for IV selection. We will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.9.}
+\item{alpha}{a number between 0 and 1 to specify the threshold for IV selection. We will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.5.}
 
 \item{nsam}{the size of individuals in each subsample of random graph forest. Default is 1000.}
 

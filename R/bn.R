@@ -6,7 +6,7 @@
 #' @param bn_method method for BN structure learning. Possible values are the function name of structure learning algorithm implemented in bnlearn. Default is "hc".
 #' @param repeats an integer standing for the number of subsamples or bootstraps. Default is 1000.
 #' @param selectNum the number of instrument to select. Default is NA.
-#' @param alpha a number between 0 and 1 to specify the threshold for IV selection. We will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.9.
+#' @param alpha a number between 0 and 1 to specify the threshold for IV selection. We will use a threshold for variant selection as alpha*psam/length(snp). If selectNum is specified, the parameter will not be used. Default is 0.5.
 #' @param nsam the size of individuals in each subsample of random graph forest. Default is 1000.
 #' @param psam the size of variants in each subsample of random graph forest. Default is 100.
 #' @param sample_replace is a boolean value to determine the sampling methods for individuals. TRUE with replacement and FALSE without replacement. Default is TRUE.
@@ -31,7 +31,7 @@
 #'
 #' model <- bn(df,snpname,"x")
 #'
-bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=NA,alpha=0.9,nsam=1000,psam=100,sample_replace=TRUE){
+bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=NA,alpha=0.5,nsam=1000,psam=100,sample_replace=TRUE){
   library("bnlearn")
   library("plyr")
   library("dplyr")
