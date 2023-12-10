@@ -118,7 +118,13 @@ with pm.Model() as shrink_model:
     # Likelihoods
     X = pm.Normal('X', mu=omegax + pm.math.dot(Z, alpha) + u * deltax, sigma=sigmax, observed=X)
     Y = pm.Normal('Y', mu=omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay, sigma=sigmay, observed=Y) # for quantitative outcome
-    # Y = pm.Bernoulli('Y', p=pm.invlogit(omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay), observed=Y)  # for binary outcome
+```
+For binary outcome, the likelihood of `Y` could be adjusted according to the model used, like logistic model or probit model. We recommend to use probit model for a better performance in covergence and a more pellucid interpretation.
+```python
+with pm.Model() as shrink_model:
+    # for binary outcome
+    Y = pm.Bernoulli('Y', p=pm.invprobit(omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay), observed=Y) # probit model
+    # Y = pm.Bernoulli('Y', p=pm.invlogit(omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay), observed=Y) # logistic model
 ```
 
 Then sample the posterior distribution using MCMC. Different samplers can be used, like NumPyro JAX NUTS sampler (by specifying `nuts_sampler="numpyro"`, BlackJAX NUTS sampler (by specifying `nuts_sampler="blackjax"`), and Nutpie Rust NUTS sampler (by specifying `nuts_sampler="nutpie"`). We recommend to use NumPyro JAX NUTS sampler here. To know more about NUTS samplers, please see <https://www.pymc.io/projects/examples/en/latest/samplers/fast_sampling_with_jax_and_numba.html>.
