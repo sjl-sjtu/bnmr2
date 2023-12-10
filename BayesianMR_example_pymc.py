@@ -72,8 +72,9 @@ with pm.Model() as shrink_model:
     
     # Likelihoods
     X = pm.Normal('X', mu=omegax + pm.math.dot(Z, alpha) + u * deltax, sigma=sigmax, observed=X)
-    Y = pm.Normal('Y', mu=omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay, sigma=sigmay, observed=Y)
-    # Y = pm.Bernoulli('Y', p=pm.invlogit(omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay), observed=Y)  # for binary
+    Y = pm.Normal('Y', mu=omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay, sigma=sigmay, observed=Y) # for quantitative trait
+    # Y = pm.Bernoulli('Y', p=pm.invlogit(omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay), observed=Y)  # for binary trait: logistic model
+    # Y = pm.Bernoulli('Y', p=pm.invprobit(omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay), observed=Y)  # for binary trait: probit model
 
 with shrink_model:    
     trace = pm.sample(draws=5000, tune=5000, chains=4, cores=4, target_accept=0.9,nuts_sampler="numpyro")
