@@ -14,8 +14,9 @@ Imports:
     MendelianRandomization,
     plyr,
     dplyr,
-	AER,
-	ivmodel,
-	parallel,
-	purrr
+    AER,
+    ivmodel,
+    parallel,
+    purrr,
+    foreach
 RoxygenNote: 7.2.3
