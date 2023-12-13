@@ -119,7 +119,7 @@ with pm.Model() as shrink_model:
     X = pm.Normal('X', mu=omegax + pm.math.dot(Z, alpha) + u * deltax, sigma=sigmax, observed=X)
     Y = pm.Normal('Y', mu=omegay + pm.math.dot(Z, gamma) + X * beta + u * deltay, sigma=sigmay, observed=Y) # for quantitative outcome
 ```
-For binary outcome, the likelihood of `Y` could be adjusted according to the model used, like logistic model or probit model. We recommend to use probit model for a better performance in covergence and a more pellucid interpretation.
+For binary outcome, the likelihood of `Y` could be adjusted according to the model used, like logistic model or probit model.
 ```python
 with pm.Model() as shrink_model:
     # for binary outcome
