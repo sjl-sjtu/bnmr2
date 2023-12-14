@@ -48,6 +48,8 @@ bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=NA,alph
     # use all cores in devtools::test()
     cores <- parallel::detectCores(logical = FALSE)
   }
+  registerDoParallel(n_cores)
+  getDoParWorkers()
 
   learnBN <- function(iter,df,snp,exposureName,nsam,psam,bn_method,sample_replace){
     n <- nrow(df)
