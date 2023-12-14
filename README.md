@@ -94,7 +94,7 @@ The tutorial for the integrated example is shown at <https://github.com/sjl-sjtu
 ## Reference
 Supplementary notes, tables, and figures for the paper can be found at <https://github.com/sjl-sjtu/bnmr/blob/main/supplementary_notes.pdf>.
 
-Latest updation at Dec. 12th, 2023.
+Latest updation at Dec. 14th, 2023.
 
 Contact me: Jianle Sun (sjl-2017@sjtu.edu.cn)
 
