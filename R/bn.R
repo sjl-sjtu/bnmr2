@@ -36,6 +36,9 @@ bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=NA,alph
   library("plyr")
   library("dplyr")
   library("parallel")
+  library("foreach")
+  loaded_packages <- search()[grepl("package:", search())]
+  loaded_packages <- sub("package:", "", loaded_packages)
 
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
   if (nzchar(chk) && chk == "TRUE") {
