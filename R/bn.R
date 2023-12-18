@@ -32,11 +32,12 @@
 #' model <- bn(df,snpname,"x")
 #'
 bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=NA,alpha=0.5,nsam=1000,psam=100,sample_replace=TRUE){
-  library("bnlearn")
-  library("plyr")
-  library("dplyr")
-  library("parallel")
-  library("foreach")
+  library(bnlearn)
+  library(plyr)
+  library(dplyr)
+  library(parallel)
+  library(doParallel)
+  library(foreach)
   loaded_packages <- search()[grepl("package:", search())]
   loaded_packages <- sub("package:", "", loaded_packages)
 
