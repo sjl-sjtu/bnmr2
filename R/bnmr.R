@@ -48,6 +48,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
   library(plyr)
   library(dplyr)
   library(parallel)
+  library(doParallel)
   library(foreach)
   library(rstan)
   library(MendelianRandomization)
