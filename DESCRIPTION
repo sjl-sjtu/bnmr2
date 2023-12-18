@@ -17,7 +17,5 @@ Imports:
     AER,
     ivmodel,
     parallel,
-    purrr,
-    foreach,
-    doParallel
+    purrr
 RoxygenNote: 7.2.3
