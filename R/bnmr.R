@@ -684,7 +684,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
   }
 
   if(length(selectsnp)==0){
-    stop("No SNPs selected!")
+    stop("No SNPs selected! Please use loose threshold!")
   }
 
   exposure <- df[,exposureName]
