@@ -683,6 +683,10 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     selectsnp <- dfscore%>%filter(score>=alpha*psam/length(snp))%>%pull(snp)
   }
 
+  if(length(selectsnp)==0){
+    stop("No SNPs selected!")
+  }
+
   exposure <- df[,exposureName]
   outcome <- df[,outcomeName]
   s <- selectsnp
