@@ -669,7 +669,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     '
 
   df <- as.data.frame(df)
-  df <- df[,c(snp,exposureName)]
+  df <- df[,c(snp,exposureName,outcomeName)]
   dfsnp <- df[,snp]
   exposure <- df[,exposureName]
   dfre <- BNbootstrap(df,snp,exposureName,repeats,nsam,psam,bn_method,sample_replace)
