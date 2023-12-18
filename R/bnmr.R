@@ -48,14 +48,10 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
   library(plyr)
   library(dplyr)
   library(parallel)
-  library(doParallel)
-  library(foreach)
   library(rstan)
   library(MendelianRandomization)
   library(AER)
   library(ivmodel)
-  loaded_packages <- search()[grepl("package:", search())]
-  loaded_packages <- sub("package:", "", loaded_packages)
 
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
   if (nzchar(chk) && chk == "TRUE") {
@@ -65,8 +61,6 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
     # use all cores in devtools::test()
     cores <- parallel::detectCores(logical = FALSE)
   }
-  registerDoParallel(n_cores)
-  getDoParWorkers()
 
   options(mc.cores = cores)
   rstan_options(auto_write = TRUE)
@@ -170,20 +164,17 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
   }
 
   BNbootstrap <- function(df,snp,exposureName,repeats,nsam,psam,bn_method,sample_replace){
-    # cl <- makeCluster(cores)
-    # clusterEvalQ(cl, {library("bnlearn")
-    #   library("plyr")
-    #   library("dplyr")
-    #   library("parallel")
-    # })
-    # clusterExport(cl,deparse(substitute(learnBN)),envir=environment())
-    # arcsL <- parLapply(cl,seq(1,repeats),learnBN,df,snp,exposureName,nsam,psam,bn_method,sample_replace)
-    # stopCluster(cl)
-    # # arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
-    # arcsL <- do.call(rbind.fill,arcsL)
-    arcsL <- foreach(iter=seq(1,repeats),.combine = 'rbind.fill',.packages = loaded_packages) %dopar% {
-      learnBN(iter,df,snp,exposureName,nsam,psam,bn_method,sample_replace)
-    }
+    cl <- makeCluster(cores)
+    clusterEvalQ(cl, {library("bnlearn")
+      library("plyr")
+      library("dplyr")
+      library("parallel")
+    })
+    clusterExport(cl,deparse(substitute(learnBN)),envir=environment())
+    arcsL <- parLapply(cl,seq(1,repeats),learnBN,df,snp,exposureName,nsam,psam,bn_method,sample_replace)
+    stopCluster(cl)
+    # arcsL <- replicate(repeats,learnBN(df,nsam,bn_method),simplify = FALSE)
+    arcsL <- do.call(rbind.fill,arcsL)
     arcsL$from <- as.factor(arcsL$from)
     arcsL$to <-as.factor(arcsL$to)
     arcsL$count <- rep(1,nrow(arcsL))

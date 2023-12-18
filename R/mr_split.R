@@ -586,7 +586,7 @@ mr_split <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",pri
       }else if(init=="ivw"){
         risultato <- mr_allmethods(oggetto, method = "ivw")
         betainitestimate <- risultato$Values[4,2]
-      }else if(class(init)=="numeric"){
+      }else if(inherits(init, "numeric")){
         betainitestimate <- init[1]
       }else{
         stop("no this method to get initial value!")
@@ -629,7 +629,7 @@ mr_split <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",pri
       }else if(init=="ivw"){
         risultato <- mr_allmethods(oggetto, method = "ivw")
         betainitestimate <- risultato$Values[4,2]
-      }else if(class(init)=="numeric"){
+      }else if(inherits(init, "numeric")){
         betainitestimate <- init[1]
       }else{
         stop("no this method to get initial value!")
