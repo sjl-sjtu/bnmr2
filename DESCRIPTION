@@ -18,5 +18,6 @@ Imports:
     ivmodel,
     parallel,
     purrr,
-    foreach
+    foreach,
+    doParallel
 RoxygenNote: 7.2.3
