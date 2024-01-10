@@ -8,7 +8,7 @@ Current version: 0.2.2
 You can install the package as the following:
 ```R
 library(devtools)
-devtools::install_github("sjl-sjtu/bnmr")
+devtools::install_github("sjl-sjtu/bnmr2")
 ```
 ### 2. Beginners' Guide
 Here we provide a illustrational step-by-step example with a simulated dataset to demonstrate the usage of `bnmr`.
