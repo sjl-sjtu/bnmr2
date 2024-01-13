@@ -99,7 +99,6 @@ We recommend to conduct Bayesian MR analysis within large-scale biobank using Py
 The tutorial for the integrated example is shown at <https://github.com/sjl-sjtu/bnmr/blob/main/integrated_example.md>.
 
 ## Reference
-Supplementary notes, tables, and figures for the paper can be found at <https://github.com/sjl-sjtu/bnmr/blob/main/supplementary_notes.pdf>.
 
 Contact me: Jianle Sun (sjl-2017@sjtu.edu.cn)
 
