@@ -12,6 +12,11 @@ You can install the package as the following:
 library(devtools)
 devtools::install_github("sjl-sjtu/bnmr2")
 ```
+Check the installation
+```R
+library(bnmr2)
+```
+
 ### 2. Beginners' Guide
 Here we provide a illustrational step-by-step example with a simulated dataset to demonstrate the usage of `bnmr2`.
 
