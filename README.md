@@ -52,7 +52,7 @@ After selecting IVs, the Bayesian Mendelian randomization model can be used to e
 IVs <- rgf_results$selectsnp
 mr_results <- mr(df,IVs,"x","y",mr_model="linear",prior="horseshoe",n.iter=5000,n.chain=4)
 # show results
-print(mr_results$mean,mr_results$se,mr_results$lower,mr_results$upper)
+print(c(mr_results$mean,mr_results$se,mr_results$lower,mr_results$upper))
 ```
 
 We implemented linear (for quantitative outcome, by specifying `mr_model="linear"`) and logistic (for binary outcome, by specifying `mr_model="logit"`) model in Mendelian randomization. Note that for hypothesis testing purposes, a linear model can also be used for binary outcomes like diseases. In general, linear models are more efficiency.
