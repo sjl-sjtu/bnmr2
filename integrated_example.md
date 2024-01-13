@@ -21,7 +21,7 @@ df %>% write_csv("RBC_bind.csv")
 ### 2. Learning Stage
 Apply RGF to the datasets and attain the adjacency scores for each loci.
 ```R
-library(bnmr)
+library(bnmr2)
 ns <- 4000
 ps <- 150
 r <- 5000
