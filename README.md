@@ -33,7 +33,7 @@ df$y <- 0.5*df$x+rnorm(n,0,1)
 #### 2) Learning stage: RGF for IV selection
 The example dataset includes 2,000 samples and 200 SNP loci, as well as two phenotypes, `x` and `y`. We now use a random graph forest (RGF) to select the loci that directly affect the exposed x. This can be done by using the `bn` function of package `bnmr2`.
 ```R
-library(bnmr)
+library(bnmr2)
 rgf_results <- bn(df,snpname,"x",bn_method="hc",repeats=1000,alpha=0.9,nsam=2000,psam=100)
 ```
 
