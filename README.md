@@ -1,7 +1,9 @@
 # Bayesian Network-based Mendelian Randomization (BNMR)
-This is an R package to conduct causal estimation between exposure and outcome on GWAS data using BNMR model, which is a two-staged framework to deal with the imperfect genetic instruments. It selects approaciate genetic instruments via random graph forest, an ensemble approach comprises a series Bayesian network structure learning within sampled variants and exposure. It then uses the Bayesian Mendelian randomization with a shrinkage prior to cope with horizontal pleiotropy and obtain a robust estimate. 
+This is an R package to conduct causal estimation between exposure and outcome on GWAS data using the Bayesian Network-based Mendelian Randomization (BNMR), which is a two-stage framework to deal with imperfect genetic instruments (horizontal pleiotropy, linkage disequilibrium, epistasis, etc.). It selects variants with a direct effect on the exposure as instrumental variables via random graph forest (RGF), an ensemble approach comprised of a series of Bayesian network structure learning processes within sampled variants and exposure. It then uses the Bayesian Mendelian randomization (BMR) with a shrinkage prior on the nusance parameters to cope with potential horizontal pleiotropy and obtain a robust estimate. 
 
-Current version: 0.2.2
+Current version: 0.3.0
+
+Latest updation at Dec. 14th, 2023. We have renamed the package as `bnmr2` to avoid potential conflict with another previous package.
 
 ## Tutorial
 ### 1. Installation
@@ -93,8 +95,6 @@ The tutorial for the integrated example is shown at <https://github.com/sjl-sjtu
 
 ## Reference
 Supplementary notes, tables, and figures for the paper can be found at <https://github.com/sjl-sjtu/bnmr/blob/main/supplementary_notes.pdf>.
-
-Latest updation at Dec. 14th, 2023.
 
 Contact me: Jianle Sun (sjl-2017@sjtu.edu.cn)
 
