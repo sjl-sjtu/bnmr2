@@ -39,7 +39,7 @@ df$y <- 0.5*df$x+rnorm(n,0,1)
 The example dataset includes 2,000 samples and 200 SNP loci, as well as two phenotypes, `x` and `y`. We now use a random graph forest (RGF) to select the loci that directly affect the exposed x. This can be done by using the `bn` function of package `bnmr2`.
 ```R
 library(bnmr2)
-rgf_results <- bn(df,snpname,"x",bn_method="hc",repeats=1000,alpha=0.9,nsam=2000,psam=100)
+rgf_results <- bn(df,snpname,"x",bn_method="hc",repeats=1000,alpha=0.5,nsam=2000,psam=100)
 ```
 
 The object `rgf_results` is a list containing two objects. The first object, `selectsnp`, is the names of genetic instrumental variables (IVs) selected based on predefined parameters, and the second object, `dfscore`, is the complete RGF result, which is a data frame containing two columns - the first column is the name of the SNP, and the second column is the corresponding adjacency score, arranged in descending order of adjacency scores. 
