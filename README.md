@@ -75,7 +75,7 @@ The main hyperparameters of the inference phase include the shrinkage prior `pri
 * Numbers of iterations `n.iter` and chains `n.chain`: We endorse the use of at least 4 chains and at least 2000 iterations per chain in MCMC.
 
 ### 4. API
-Detail usage and examples can be found at <https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.2.pdf>.
+Detail usage and examples can be found at <[https://github.com/sjl-sjtu/bnmr/blob/main/bnmr_0.2.2.pdf](https://github.com/sjl-sjtu/bnmr2/blob/main/bnmr2_0.3.0.pdf)>.
 
 ### 5. Adaptation to large-scale biobank-level data
 For Bayesian posterior sampling within large-scale dataset (like biobank), we provide two options:
