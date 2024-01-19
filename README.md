@@ -3,7 +3,7 @@ This is an R package to conduct causal estimation between exposure and outcome o
 
 Current version: 0.3.0
 
-Latest updation at Jan. 13th, 2024. We have renamed the package to `bnmr2` to avoid potential conflict with another previous package.
+Latest updation at Jan. 13th, 2024. We have renamed the package to `bnmr2` to avoid potential conflict with another previous package (in Economics).
 
 ## Tutorial
 ### 1. Installation
