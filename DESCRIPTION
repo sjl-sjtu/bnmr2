@@ -4,7 +4,7 @@ Title: A package to conduct Bayesian Network-based Mendelian randomization using
 Version: 0.3.0
 Author: Jianle Sun
 Maintainer: The package maintainer <sjl-2017@sjtu.edu.cn>
-Description: An R package to conduct causal estimation between exposure and outcome on GWAS data using the Bayesian Network-based Mendelian Randomization (BNMR), which is a two-stage framework to deal with imperfect genetic instruments (horizontal pleiotropy, linkage disequilibrium, epistasis, etc.). It selects variants with a direct effect on the exposure as instrumental variables via random graph forest (RGF), an ensemble approach comprised of a series of Bayesian network structure learning processes within sampled variants and exposure. It then uses the Bayesian Mendelian randomization (BMR) with a shrinkage prior on the nusance parameters to cope with potential horizontal pleiotropy and obtain a robust estimate. 
+Description: An R package to conduct causal estimation between exposure and outcome on GWAS data using the Bayesian Network-based Mendelian Randomization (BNMR), which is a two-stage framework to deal with imperfect genetic instruments (horizontal pleiotropy, linkage disequilibrium, epistasis, etc.). It selects variants with a direct effect on the exposure as instrumental variables via random graph forest (RGF), an ensemble approach comprised of a series of Bayesian network structure learning processes within sampled variants and exposure. It then uses the Bayesian Mendelian randomization (BMR) with a shrinkage prior on the nuisance parameters to cope with potential horizontal pleiotropy and obtain a robust estimate. 
 License: GPL
 Encoding: UTF-8
 LazyData: False
