@@ -3,7 +3,7 @@ This is an R package to conduct causal estimation between exposure and outcome o
 
 Current version: 0.3.0
 
-Latest updation at Jan. 13th, 2024. We have renamed the package to `bnmr2` to avoid potential conflict with another previous package (in Econometrics).
+Latest updation at Jan. 24th, 2024. We have renamed the package to `bnmr2` to avoid potential conflict with another previous package (in Econometrics).
 
 ## Tutorial
 ### 1. Installation
@@ -99,6 +99,14 @@ We recommend to conduct Bayesian MR analysis within large-scale biobank using Py
 The tutorial for the integrated example is shown at <https://github.com/sjl-sjtu/bnmr/blob/main/integrated_example.md>.
 
 ## Reference
+Jianle Sun, et al. Bayesian network-based Mendelian randomization for variant prioritization and phenotypic causal inference, *Human Genetics*, accepted.
+
+Other reference links:
+* bnlearn: Bayesian network structure learning (<https://www.bnlearn.com/>)
+* stan: statistical modeling and high-performance statistical computation (<https://mc-stan.org/>)
+* PyMC: probabilistic programming library for Python (<https://www.pymc.io/welcome.html>)
+* Bayesian MR: <https://github.com/carloberzuini/BMR>
+* shrinkage priors for Bayesian penalized regression: <https://github.com/sara-vanerp/bayesreg>
 
 Contact me: Jianle Sun (sjl-2017@sjtu.edu.cn)
 
