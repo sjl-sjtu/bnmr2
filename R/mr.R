@@ -146,7 +146,9 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
         for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
             lambda[k] ~ uniform(0,1);
-            gamma[k] ~ normal(0, lambda[k]*tau[k]);
+            # gamma[k] ~ normal(0, lambda[k]*tau[k]);
+            target += log_sum_exp(log(lambda[k]) + normal_lpdf(gamma[k] | 0, sqrt(0.001)), 
+ 						    log(1-lambda[k]) + normal_lpdf(gamma[k] | 0, sqrt(tau[k])));
             //prior for tau
             tau[k]  ~  inv_gamma(0.5,0.5);
         }
@@ -195,8 +197,8 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
         u 	~ normal(0,1);
         for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
-            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001),
- 						  bernoulli_lpmf(1 | pi) + normal_lpdf(gamma[k] | 0, tau[k]));
+            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, sqrt(0.001)),
+ 						  bernoulli_lpmf(1 | pi) + normal_lpdf(gamma[k] | 0, sqrt(tau[k])));
  						//prior for tau
             tau[k]  ~  inv_gamma(0.5,0.5);
         }
@@ -389,7 +391,9 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
             lambda[k] ~ uniform(0,1);
-            gamma[k] ~ normal(0, lambda[k]*tau[k]);
+            # gamma[k] ~ normal(0, lambda[k]*tau[k]);
+            target += log_sum_exp(log(lambda[k]) + normal_lpdf(gamma[k] | 0, sqrt(0.001)), 
+ 						    log(1-lambda[k]) + normal_lpdf(gamma[k] | 0, sqrt(tau[k])));
             //prior for tau
             tau[k]  ~  inv_gamma(0.5,0.5);
         }
@@ -437,8 +441,8 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
       u 	~ normal(0,1);
       for(k in 1:J){
             alpha[k] ~ normal(mualpha, sigmaalpha);
-            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, 0.001),
- 						  bernoulli_lpmf(1 | pi) + normal_lpdf(gamma[k] | 0, tau[k]));
+            target += log_sum_exp(bernoulli_lpmf(0 | pi) + normal_lpdf(gamma[k] | 0, sqrt(0.001)),
+ 						  bernoulli_lpmf(1 | pi) + normal_lpdf(gamma[k] | 0, sqrt(tau[k])));
  						//prior for tau
             tau[k]  ~  inv_gamma(0.5,0.5);
         }
