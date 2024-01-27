@@ -47,7 +47,7 @@ The object `rgf_results` is a list containing two objects. The first object, `se
 We provide two criteria for selecting IVs from adjacency scores, the first is to specify the number of IVs directly, which can be achieved by specifying the `selectNum` parameter in the `bn` function; The second is to set a threshold $\alpha$ between 0-1, at which point SNPs with a critical score greater than `alpha*psam/p` (`p` is the total number of SNPs assessed by RGF and `psam` is the number of SNPs selected per sampling) will be selected as IVs, which can be achieved by specifying parameter `alpha` in the `bn` function. Note that the parameter `alpha` will not work when the parameter `selectNum` is specified. The default `alpha` of the program is 0.5. Of course, you can also use the data frame containing full adjacency score of the output to define your own criteria to select IVs. Please note that the selection of IVs mentioned here is closely related to the inference stage, so it is necessary to adjust the threshold and select an appropriate number of IVs based on the actual situation.
 
 #### 3) Inference stage: Bayesian estimation
-After selecting IVs, the Bayesian Mendelian randomization model can be used to estimate the causal parameters of exposure `x` to outcome `y`, which can be achieved by the function `mr` in the `bnmr2` package.
+After selecting IVs, the Bayesian Mendelian randomization model with a shrinkage prior on the instruments' horizontal pleiotropic effects can be used to estimate the causal parameters of exposure `x` to outcome `y`, which can be achieved by the function `mr` in the `bnmr2` package.
 ```R
 IVs <- rgf_results$selectsnp
 mr_results <- mr(df,IVs,"x","y",mr_model="linear",prior="horseshoe",n.iter=5000,n.chain=4)
