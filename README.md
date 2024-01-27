@@ -1,9 +1,9 @@
 # Bayesian Network-based Mendelian Randomization (BNMR)
 This is an R package to conduct causal estimation between exposure and outcome on GWAS data using the Bayesian Network-based Mendelian Randomization (BNMR), which is a two-stage framework to deal with imperfect genetic instruments (horizontal pleiotropy, linkage disequilibrium, epistasis, etc.). It selects variants with a direct effect on the exposure as instrumental variables via random graph forest (RGF), an ensemble approach comprised of a series of Bayesian network structure learning processes within sampled variants and exposure. It then uses the Bayesian Mendelian randomization (BMR) with a shrinkage prior on the nuisance parameters to cope with potential horizontal pleiotropy and obtain a robust estimate. 
 
-Current version: 0.3.0
+Current version: 0.3.1
 
-Latest updation at Jan. 24th, 2024. We have renamed the package to `bnmr2` to avoid potential conflict with another previous package (in Econometrics).
+Latest updation at Jan. 27th, 2024. We have renamed the package to `bnmr2` to avoid potential conflict with another previous package (in Econometrics).
 
 ## Tutorial
 ### 1. Installation
@@ -80,7 +80,7 @@ The main hyperparameters of the inference phase include the shrinkage prior `pri
 * Numbers of iterations `n.iter` and chains `n.chain`: We endorse the use of at least 4 chains and at least 2000 iterations per chain in MCMC.
 
 ### 4. API
-Detail usage and examples can be found at [https://github.com/sjl-sjtu/bnmr/blob/main/bnmr2_0.3.0.pdf](https://github.com/sjl-sjtu/bnmr2/blob/main/bnmr2_0.3.0.pdf).
+Detail usage and examples can be found at [https://github.com/sjl-sjtu/bnmr/blob/main/bnmr2_0.3.1.pdf](https://github.com/sjl-sjtu/bnmr2/blob/main/bnmr2_0.3.1.pdf).
 
 ### 5. Adaptation to large-scale biobank-level data
 For Bayesian posterior sampling within large-scale dataset (like biobank), we provide two options:
