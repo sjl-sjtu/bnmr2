@@ -582,7 +582,7 @@ mr <- function(df,selectsnp,exposureName,outcomeName,mr_model="linear",prior="ho
     }else if(init=="LIML"){
       m <- ivmodel(outcome,exposure,Z)
       risultato <- LIML(m)
-      betainitestimate <- risultato$point.est
+      betainitestimate <- as.numeric(risultato$point.est)
     }else if(init=="median"){
       if(J<3){
         stop("median initial needs at least 3 IVs")
