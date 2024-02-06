@@ -178,7 +178,7 @@ bn <- function(df,snp,exposureName,bn_method="hc",repeats=1000,selectNum=NA,alph
     selectsnp <- dfscore%>%filter(score>=alpha*psam/length(snp))%>%pull(snp)
   }
 
-  re <- list(IV=selectsnp,score=dfscore)
+  re <- list(selectsnp=selectsnp,dfscore=dfscore)
   return(re)
 }
 
