@@ -851,7 +851,7 @@ bnmr <- function(df,snp,exposureName,outcomeName,bn_method="hc",repeats=1000,sel
 
   beta <- rstan::extract(fit,pars='beta',permuted=FALSE)
   mobeta <- monitor(beta,digits_summary=5)
-  re <- list(IV=selectsnp,score=dfscore,
+  re <- list(selectsnp=selectsnp,dfscore=dfscore,
              betaList=beta,mean=mobeta$mean,se=mobeta$sd,
              lower=mobeta$`2.5%`,upper=mobeta$`97.5%`,
              Rhat=mobeta$Rhat,fit_detail=fit)
